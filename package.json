@@ -1,0 +1,57 @@
+{
+  "name": "vitepress-starter",
+  "version": "0.0.1",
+  "description": "vitepress 文档基础框架",
+  "author": "caiyong <yong.cai@kapeixi.com>",
+  "main": "index.js",
+  "typings": "./index.d.ts",
+  "homepage": "https://nanjingcaiyong.github.io/vitepress-starter",
+  "bugs": {
+    "url": "https://github.com/nanjingcaiyong/vitepress-starter/issues",
+    "email": "yong.cai@kapeixi.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nanjingcaiyong/vitepress-starter"
+  },
+  "license": "ISC",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "scripts": {
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:serve": "vitepress serve docs",
+    "deploy": "bash deploy.sh",
+    "prepare": "husky install",
+    "lint": "eslint --ext .js,.ts lib",
+    "lint:fix": "eslint --fix --ext .js,.ts lib",
+    "release": "standard-version --infile docs/CHANGELOG.md"
+  },
+  "dependencies": {
+    "vue": "^3.3.4"
+  },
+  "gitHead": "112ce0a10bd4a3cc514a9dd861f4e8ffd5671f2c",
+  "devDependencies": {
+    "@commitlint/cli": "^17.0.2",
+    "@commitlint/config-conventional": "^17.0.2",
+    "@docsearch/css": "^3.1.0",
+    "@docsearch/js": "^3.1.0",
+    "@typescript-eslint/eslint-plugin": "^5.28.0",
+    "@typescript-eslint/parser": "^5.28.0",
+    "commitizen": "^4.2.4",
+    "core-js": "^3.21.1",
+    "eslint": "^8.17.0",
+    "husky": "^8.0.1",
+    "lint-staged": "^13.0.1",
+    "standard-version": "^9.5.0",
+    "vitepress": "^1.0.0-alpha.2"
+  }
+}
