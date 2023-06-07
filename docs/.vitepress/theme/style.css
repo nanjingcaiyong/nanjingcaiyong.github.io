@@ -1,0 +1,217 @@
+.visible {
+  visibility: visible
+}
+
+.fixed {
+  position: fixed
+}
+
+.absolute {
+  position: absolute
+}
+
+.relative {
+  position: relative
+}
+
+.sticky {
+  position: sticky
+}
+
+.top-\[10px\] {
+  top: 10px
+}
+.top-\[92px\] {
+  top: 92px
+}
+
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto
+}
+
+.mb-\[8px\] {
+  margin-bottom: 8px
+}
+
+.ml-\[12px\] {
+  margin-left: 12px
+}
+
+.mb-\[25px\] {
+  margin-bottom: 25px
+}
+.mt-\[6px\] {
+  margin-top: 6px;
+}
+
+.mt-\[25px\] {
+  margin-top: 25px
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2
+}
+
+.block {
+  display: block
+}
+
+.flex {
+  display: flex
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.grid {
+  display: grid
+}
+
+.text-center {
+  text-align: center;
+}
+
+.\!hidden {
+  display: none !important
+}
+
+.hidden {
+  display: none
+}
+
+.h-0 {
+  height: 0px
+}
+
+.h-full {
+  height: 100%
+}
+
+.w-full {
+  width: 100%
+}
+
+.w-\[100px\] {
+  width: 100px
+}
+
+.w-\[30\%\] {
+  width: 30%
+}
+
+.max-w-\[90\%\] {
+  max-width: 90%
+}
+
+.flex-shrink {
+  flex-shrink: 1
+}
+
+.flex-grow {
+  flex-grow: 1
+}
+
+
+.flex-wrap {
+  flex-wrap: wrap
+}
+
+.items-center {
+  align-items: center
+}
+
+.justify-between {
+  justify-content: space-between
+}
+
+.border {
+  border-width: 1px
+}
+
+.bg-gray-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(107 114 128 / var(--tw-bg-opacity))
+}
+
+.object-contain {
+  -o-object-fit: contain;
+  object-fit: contain
+}
+
+.object-cover {
+  -o-object-fit: cover;
+  object-fit: cover
+}
+
+.pb-\[70\%\] {
+  padding-bottom: 70%
+}
+
+.text-\[12px\] {
+  font-size: 12px
+}
+
+.text-\[14px\] {
+  font-size: 14px
+}
+
+.text-\[18px\] {
+  font-size: 18px
+}
+
+.font-\[600\] {
+  font-weight: 600
+}
+
+.uppercase {
+  text-transform: uppercase
+}
+
+.leading-none {
+  line-height: 1
+}
+
+.outline {
+  outline-style: solid
+}
+
+@media (min-width: 768px) {
+  .md\:ml-\[24px\] {
+    margin-left: 24px
+  }
+
+  .md\:block {
+    display: block
+  }
+
+  .md\:w-\[65\%\] {
+    width: 65%
+  }
+}
+
+@media (min-width: 1280px) {
+  .xl\:mt-\[60px\] {
+    margin-top: 60px
+  }
+
+  .xl\:max-w-\[60\%\] {
+    max-width: 60%
+  }
+
+  .xl\:pb-\[30\%\] {
+    padding-bottom: 30%
+  }
+}

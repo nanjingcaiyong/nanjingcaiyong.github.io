@@ -36,6 +36,7 @@
     "release": "standard-version --infile docs/CHANGELOG.md"
   },
   "dependencies": {
+    "element-plus": "^2.0.2",
     "vue": "^3.3.4"
   },
   "gitHead": "112ce0a10bd4a3cc514a9dd861f4e8ffd5671f2c",
@@ -51,7 +52,7 @@
     "eslint": "^8.17.0",
     "husky": "^8.0.1",
     "lint-staged": "^13.0.1",
-    "standard-version": "^9.5.0",
+    "tailwindcss": "^3.3.2",
     "vitepress": "^1.0.0-alpha.2"
   }
 }

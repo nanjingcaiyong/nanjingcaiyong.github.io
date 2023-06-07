@@ -2,11 +2,12 @@ import { defineConfig } from 'vitepress'
 const config = defineConfig({
   base: '/',
   lang: 'zh-CN',
-  title: '博客',
+  title: '一颗白菜',
   description: 'vitepress document basic framework',
   lastUpdated: true,
   themeConfig: {
-    sidebar: [],
+    // sidebar: [],
+  
     nav:  [
       { 
         text: '简历', 
