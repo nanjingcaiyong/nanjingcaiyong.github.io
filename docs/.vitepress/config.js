@@ -10,16 +10,37 @@ const config = defineConfig({
   
     nav:  [
       { 
-        text: '简历', 
+        text: '关于我', 
         link: '/guide.md',
       },
       {
-        text: '工作流',
-        link: 'https://nanjingcaiyong.github.io/flow/'
+        text: '计算机基础', 
+        link: '/guide.md',
+      },
+      { 
+        text: '大前端',
+        link: '/guide.md',
+      },
+      { 
+        text: '数据库',
+        link: '/guide.md',
       },
       {
-        text: 'c端工具库',
-        link: 'https://nanjingcaiyong.github.io/rich-js/'
+        text: '运维',
+        link: '/guide.md',
+      },
+      {
+        text: '开源项目',
+        items: [
+          {
+            text: '工作流',
+            link: 'https://nanjingcaiyong.github.io/flow/'
+          },
+          {
+            text: 'c端工具库',
+            link: 'https://nanjingcaiyong.github.io/rich-js/'
+          }
+        ]
       }
     ],
     editLink: {
@@ -44,6 +65,9 @@ const config = defineConfig({
     footer: {
       message: 'Released under the MIT License.',
       copyright: 'Copyright © 2022-present yong.cai'
+    },
+    search: {
+      provider: 'local'
     }
   }
 })

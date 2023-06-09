@@ -1,9 +1,9 @@
 <template>
   <div>
     <Card 
-      v-for="item in news"
+      v-for="(item, index) in news"
       :data="item"
-      class="mb-[25px]"
+      :class="{'mb-[25px]': index < news.length - 1}"
     />
   </div>
 </template>

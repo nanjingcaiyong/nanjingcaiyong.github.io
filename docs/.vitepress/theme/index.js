@@ -1,5 +1,5 @@
 import DefaultTheme from 'vitepress/theme';
-import { ElCarousel, ElCard, ElCarouselItem } from 'element-plus';
+import { ElCarousel, ElCard, ElCarouselItem, ElPopover } from 'element-plus';
 import 'element-plus/dist/index.css';
 import { Carousel, News } from './components';
 import { Home } from './pages/home'
@@ -11,6 +11,7 @@ export default {
     app.component('ElCarousel', ElCarousel);
     app.component('ElCard', ElCard)
     app.component('ElCarouselItem', ElCarouselItem)
+    app.component('ElPopover', ElPopover);
     app.component('Carousel', Carousel);
     app.component('News', News)
     app.component('Home', Home)

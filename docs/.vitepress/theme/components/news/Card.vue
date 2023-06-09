@@ -5,9 +5,15 @@
         <div class="letter">
           <h3 class="text-[18px] font-[600] mb-[8px] leading-none">{{ data.title }}</h3>
           <p class="text-[14px] line-clamp-2 abc mb-[8px]">{{ data.content }}</p>
-          <p class="text-[12px]"><span class="split">浏览量：{{ data.view }}</span><span>{{ data.date }}</span></p>
+          <p class="text-[12px]">
+            <span class="split">{{ data.date }}</span>
+            <span>{{ data.type }}</span>
+          </p>
         </div>
-        <img class="flex w-[100px] ml:w-[120px] object-contain ml-[12px] md:ml-[24px]" src="../../assets/news_1.jpg">
+        <img 
+          class="flex w-[100px] ml:w-[120px] object-contain ml-[12px] md:ml-[24px]" 
+          src="../../assets/news_1.jpg"
+        >
       </div>
     </a>
   </el-card>
