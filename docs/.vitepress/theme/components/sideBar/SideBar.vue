@@ -2,7 +2,7 @@
   <el-card class="box-card h-full">
     <div class="letter flex justify-between text-center">
       <div class="flex flex-col">
-        <span class="text-[18px] font-[600]">253</span>
+        <span class="text-[18px] font-[600]">{{news.length}}</span>
         <span class="mt-[6px]">博客文章</span>
       </div>
       <div class="flex flex-col">
@@ -16,6 +16,18 @@
     </div>
   </el-card>
 </template> 
+
+<script>
+import { defineComponent, inject, toRefs } from 'vue'
+export default defineComponent({
+  setup () {
+    const state = inject('store')
+    return {
+      ...toRefs(state)
+    }
+  }
+})
+</script>
 
 <style>
 .letter {
