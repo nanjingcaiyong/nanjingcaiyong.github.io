@@ -20,14 +20,17 @@
 </template>
 
 
-<script setup>
-import { defineProps } from 'vue';
-defineProps({
-  data: {
-    type: Object,
-    default: () => ({})
+<script>
+import { defineComponent } from 'vue';
+export default defineComponent({
+  name: 'NewCard',
+  props: {
+    data: {
+      type: Object,
+      default: () => ({})
+    }
   }
-})
+});
 </script>
 <style>
 .letter {

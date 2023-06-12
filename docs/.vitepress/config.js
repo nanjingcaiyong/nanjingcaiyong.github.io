@@ -6,28 +6,39 @@ const config = defineConfig({
   description: 'vitepress document basic framework',
   lastUpdated: true,
   themeConfig: {
-    // sidebar: [],
-  
     nav:  [
       { 
         text: '关于我', 
-        link: '/guide.md',
+        link: '/about',
       },
       {
         text: '计算机基础', 
-        link: '/guide.md',
+        link: '/computer',
       },
       { 
         text: '大前端',
-        link: '/guide.md',
+        items: [
+          {
+            text: 'css',
+            link: '/large-front-end/css'
+          },
+          {
+            text: 'html',
+            link: '/large-front-end/html'
+          },
+          {
+            text: 'es6',
+            link: '/large-front-end/es6'
+          },
+        ]
       },
       { 
         text: '数据库',
-        link: '/guide.md',
+        link: '/database',
       },
       {
         text: '运维',
-        link: '/guide.md',
+        link: '/devops',
       },
       {
         text: '开源项目',

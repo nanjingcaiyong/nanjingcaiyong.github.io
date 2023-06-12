@@ -65,6 +65,11 @@
 .mt-\[25px\] {
   margin-top: 25px
 }
+
+.mr-\[10px\] {
+  margin-right: 10px;
+}
+
 .mb-\[5px\] {
   margin-bottom: 5px
 }
@@ -171,6 +176,8 @@
   width: 30%
 }
 
+
+
 .max-w-\[90\%\] {
   max-width: 90%
 }
@@ -266,6 +273,10 @@
   line-height: 1
 }
 
+.leading-\[2\.5\] {
+  line-height: 2.5;
+}
+
 .leading-\[20px\] {
   line-height: 20px;
 }
@@ -311,6 +322,10 @@
 
   .xl\:max-w-\[60\%\] {
     max-width: 60%
+  }
+
+  .xl\:max-w-\[50\%\] {
+    max-width: 50%
   }
 
   .xl\:max-w-\[70\%\] {

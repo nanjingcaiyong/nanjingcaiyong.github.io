@@ -14,10 +14,11 @@
           placement="top-start"
           :width="200"
           trigger="hover"
+          content="this is content, this is content, this is content"
         >
-          <template #default>
+          <!-- <template #default>
             <img src="../../assets/weixin_qrcode.png">
-          </template>
+          </template> -->
           <template #reference>
             <a class="icon_weixin"></a>
           </template>
@@ -46,7 +47,7 @@
     <el-card class="hot-card mt-[10px]">
       <h2 class="desc mb-[16px]">🔥 精选文章</h2>
       <a
-      v-for="(item, index) in hots"
+        v-for="(item, index) in hots"
         :href="item.link" 
         class="flex flex-col leading-[20px]" 
         :class="{'mb-[5px]': index <= hots.length}" 
@@ -64,6 +65,7 @@
 <script>
 import { defineComponent, inject, reactive, toRefs } from 'vue'
 export default defineComponent({
+  name: 'RightBar',
   setup () {
     const store = inject('store')
     const state = reactive({
@@ -76,7 +78,6 @@ export default defineComponent({
       const infoDate = new Date(info.date)
       if (infoDate.getMonth() == new Date().getMonth()) {
         state.monthlyCount += 1;
-
         if (new Date().getDate() - infoDate.getDate() <= 7) {
           state.weeklyCount += 1;
         }
@@ -96,6 +97,7 @@ export default defineComponent({
   display: flex;
   align-items: center;
 }
+
 .count-card .split::after {
   content: "";
   display: inline-flex;
@@ -117,9 +119,11 @@ export default defineComponent({
 .letter {
   color: var(--vp-c-text-1);
 }
+
 .desc {
   color: var(--description-font-color)
 }
+
 .no::before {
   display: inline-flex;
   width: 20px;
@@ -149,15 +153,16 @@ export default defineComponent({
   background: #409EFF;
 }
 
-
 .self-introduce {
   font-size: 12px;
   color: var(--vp-c-text-1);
   line-height: 1;
 }
+
 .self-introduce p {
   line-height: 22px;
 }
+
 .self-introduce a {
   width: 53px;
   height: 53px;
@@ -167,20 +172,17 @@ export default defineComponent({
   border-radius: 50%;
   margin: 0 5px;
 }
+
 a.icon_email {
   background: url(../../assets/email.png) no-repeat center;
 }
+
 a.icon_qq {
   background: url(../../assets/qq.png) no-repeat center;
 }
+
 a.icon_weixin {
   position: relative;
   background: url(../../assets/weixin.png) no-repeat center;
 }
-/* a.icon_weixin:hover {
-  background: url(../../assets/weixin_qrcode.png);
-  background-size: contain;
-  position: absolute;
-  top: -100px;
-} */
 </style>
