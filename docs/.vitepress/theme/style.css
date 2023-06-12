@@ -93,11 +93,18 @@
   margin-left: 30px;
 }
 
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
 .line-clamp-2 {
   overflow: hidden;
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2
+  -webkit-line-clamp: 2;
 }
 
 .block {
@@ -309,7 +316,7 @@
   .xl\:max-w-\[70\%\] {
     max-width: 70%
   }
-  
+
   .xl\:max-w-\[80\%\] {
     max-width: 80%
   }

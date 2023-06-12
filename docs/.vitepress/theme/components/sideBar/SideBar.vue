@@ -2,14 +2,14 @@
   <div class="sideBar flex flex-col h-full">
     <el-card class="self-introduce">
       <div class="letter mb-[16px]">
-        <h2 class="desc text-[22px] font-[800] mb-[16px]">蔡勇的简介</h2>
-        <p><span>公司：</span><span>Cupshe</span></p>
-        <p><span>职业：</span><span>高级前端开发工程师</span></p>
-        <p><span>现居：</span><span>南京市-雨花台区</span></p>
+        <h2 class="desc text-[22px] font-[800] mb-[16px]">{{ user.name }}的简介</h2>
+        <p><span>公司：</span><span>{{ user.company }}</span></p>
+        <p><span>职业：</span><span>{{ user.job }}</span></p>
+        <p><span>现居：</span><span>{{ user.address }}</span></p>
       </div>
       <div class="flex justify-between">
-        <a href="http://mail.qq.com/cgi-bin/qm_share?t=qm_mailme&amp;email=2872845261@qq.com" class="icon_email"></a>
-        <a href="http://wpa.qq.com/msgrd?v=3&amp;uin=2872845261&amp;site=qq&amp;menu=yes" class="icon_qq"></a>
+        <a :href="user.email" class="icon_email"></a>
+        <a :href="user.qq" class="icon_qq"></a>
         <el-popover
           placement="top-start"
           :width="200"
@@ -24,7 +24,7 @@
         </el-popover>
       </div>
     </el-card>
-    <el-card class="box-card mt-[10px]">
+    <el-card class="count-card mt-[10px]">
       <div class="letter flex justify-between text-center">
         <div class="flex flex-col">
           <span class="text-[18px] font-[600]">{{news.length}}</span>
@@ -43,21 +43,19 @@
       </div>
     </el-card>
 
-    <el-card class="box-card mt-[10px]">
+    <el-card class="hot-card mt-[10px]">
       <h2 class="desc mb-[16px]">🔥 精选文章</h2>
-      <a class="flex flex-col leading-[20px] mb-[5px]">
-        <span class="no n1st text-[14px] letter">视野修炼-技术周刊</span>
-        <span class="text-[12px] ml-[30px]">2023-06-03</span>
-      </a>
-
-      <a class="flex flex-col leading-[20px] mb-[5px]">
-        <span class="no n2st text-[14px] letter">视野修炼-技术周刊</span>
-        <span class="text-[12px] ml-[30px]">2023-06-03</span>
-      </a>
-
-      <a class="flex flex-col leading-[20px]">
-        <span class="no n3st text-[14px] letter">视野修炼-技术周刊</span>
-        <span class="text-[12px] ml-[30px]">2023-06-03</span>
+      <a
+      v-for="(item, index) in hots"
+        :href="item.link" 
+        class="flex flex-col leading-[20px]" 
+        :class="{'mb-[5px]': index <= hots.length}" 
+      >
+        <span class="no text-[14px] letter line-clamp-1" :class="`n${index + 1}st`">{{ item.title }}</span>
+        <p class="text-[12px] ml-[30px] flex">
+          <span class="split desc">{{ item.date }}</span>
+          <span class="desc">{{ item.type }}</span>
+        </p>
       </a>
     </el-card>
   </div>
@@ -85,6 +83,7 @@ export default defineComponent({
       }
     }
     return {
+      hots: store.news.sort((a, b) => a.index - b.index).slice(0, 10),
       ...toRefs(store),
       ...toRefs(state)
     }
@@ -93,11 +92,11 @@ export default defineComponent({
 </script>
 
 <style>
-.sideBar .split {
+.count-card .split {
   display: flex;
   align-items: center;
 }
-.sideBar .split::after {
+.count-card .split::after {
   content: "";
   display: inline-flex;
   width: 1px;
@@ -105,6 +104,16 @@ export default defineComponent({
   margin: 0 10px;
   background-color: #4e5969;
 }
+
+.hot-card .split::after {
+  content: "";
+  display: inline-block;
+  width: 1px;
+  height: 8px;
+  margin: 0 10px;
+  background: var(--description-font-color);
+}
+
 .letter {
   color: var(--vp-c-text-1);
 }

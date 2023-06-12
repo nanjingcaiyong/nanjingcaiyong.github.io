@@ -24,7 +24,8 @@ const store = reactive({
       type: '大前端',
       img: '',
       date: '2023-06-11',
-      link: '/large-front-end/mutil-project'
+      link: '/large-front-end/mutil-project',
+      index: 1,
     },
     {
       title: '带你走进 Web Components 新世界',
@@ -32,7 +33,8 @@ const store = reactive({
       img: '',
       type: '大前端',
       date: '2023-06-10',
-      link: '/large-front-end/web-component'
+      link: '/large-front-end/web-component',
+      index: 2,
     },
     {
       title: '一行展示不下，如何隐藏单个dom?',
@@ -40,9 +42,18 @@ const store = reactive({
       img: '',
       type: '大前端',
       date: '2023-06-1',
-      link: '/large-front-end/hidden-row-dom'
+      link: '/large-front-end/hidden-row-dom',
+      index: 3,
     }
-  ]
+  ],
+  user: {
+    name: '蔡勇',
+    job: '高级前端开发工程师',
+    company: 'Cupshe',
+    address: '南京市-雨花台区',
+    email: 'http://mail.qq.com/cgi-bin/qm_share?t=qm_mailme&amp;email=2872845261@qq.com',
+    qq: 'http://wpa.qq.com/msgrd?v=3&amp;uin=2872845261&amp;site=qq&amp;menu=yes'
+  }
 });
 provide('store', store)
 </script>
