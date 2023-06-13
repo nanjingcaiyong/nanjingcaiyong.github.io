@@ -1,5 +1,5 @@
 <template>
-  <!-- <div class="max-w-[95%] xl:max-w-[50%] mx-auto">
+  <div class="max-w-[95%] xl:max-w-[50%] mx-auto">
     <el-timeline>
       <el-timeline-item v-for="item in experiences" :timestamp="item.date" placement="top">
         <el-card class="letter">
@@ -7,7 +7,7 @@
           <p><label>职位：</label><span>{{ item.job }}</span></p>
           <p class="leading-[2.5]">
             <label>技术栈：</label>
-            <span 
+            <span
               v-for="(tag, index) in item.tags" 
               class="label"
               :class="{'mr-[10px]': index < item.tags.length}"
@@ -29,40 +29,39 @@
         </el-card>
       </el-timeline-item>
     </el-timeline>
-  </div> -->
-  <div>hello world</div>
+  </div>
 </template>
 
 <script>
-// import { defineComponent, reactive, toRefs } from 'vue';
-// export default defineComponent({
-//   setup () {
-//     const store = reactive({
-//       experiences: [{
-//         company: 'Cupshe',
-//         job: '高级前端开发工程师',
-//         date: '2021.03 ～ 至今',
-//         tags: [
-//           'vue',
-//           'nodejs',
-//           'express',
-//           'typescript'
-//         ]
-//       }]
-//     });
-//     function getRGB(){
-//       let r = Math.floor(Math.random()*256);
-//       let g = Math.floor(Math.random()*256);
-//       let b = Math.floor(Math.random()*256);
-//       let rgb = 'rgb('+r+','+g+','+b+')';
-//       return rgb
-//     }
-//     return {
-//       getRGB,
-//       ...toRefs(store)
-//     }
-//   }
-// })
+import { defineComponent, reactive, toRefs } from 'vue';
+export default defineComponent({
+  setup () {
+    const store = reactive({
+      experiences: [{
+        company: 'Cupshe',
+        job: '高级前端开发工程师',
+        date: '2021.03 ～ 至今',
+        tags: [
+          'vue',
+          'nodejs',
+          'express',
+          'typescript'
+        ]
+      }]
+    });
+    function getRGB(){
+      let r = Math.floor(Math.random()*256);
+      let g = Math.floor(Math.random()*256);
+      let b = Math.floor(Math.random()*256);
+      let rgb = 'rgb('+r+','+g+','+b+')';
+      return rgb
+    }
+    return {
+      getRGB,
+      ...toRefs(store)
+    }
+  }
+})
 </script>
 
 <style>

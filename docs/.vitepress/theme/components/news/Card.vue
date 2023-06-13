@@ -1,7 +1,7 @@
 <template>
   <el-card class="news-card">
     <a :href="data.link">
-      <div class="flex items-center">
+      <div class="flex justify-between items-center">
         <div class="letter">
           <h3 class="text-[18px] font-[600] mb-[8px] leading-none">{{ data.title }}</h3>
           <p class="text-[14px] line-clamp-2 desc mb-[8px]">{{ data.content }}</p>

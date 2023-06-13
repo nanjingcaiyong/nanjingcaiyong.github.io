@@ -10,19 +10,10 @@
       <div class="flex justify-between">
         <a :href="user.email" class="icon_email"></a>
         <a :href="user.qq" class="icon_qq"></a>
-        <el-popover
-          placement="top-start"
-          :width="200"
-          trigger="hover"
-          content="this is content, this is content, this is content"
-        >
-          <template #default>
-            <img src="../../assets/weixin_qrcode.png">
-          </template>
-          <template #reference>
-            <a class="icon_weixin"></a>
-          </template>
-        </el-popover>
+        <div class="relative weixin_popover">
+          <img width="200" src="../../assets/weixin_qrcode.png" class="absolute bottom-[60px]">
+          <a class="icon_weixin"></a>
+        </div>
       </div>
     </el-card>
     <el-card class="count-card mt-[10px]">
@@ -52,8 +43,10 @@
         class="flex flex-col leading-[20px]" 
         :class="{'mb-[5px]': index <= hots.length}" 
       >
-        <span class="no text-[14px] letter line-clamp-1" :class="`n${index + 1}st`">{{ item.title }}</span>
-        <p class="text-[12px] ml-[30px] flex">
+        <span class="text-[16px] letter line-clamp-1">
+          <label :class="`no n${index + 1 > 3 ? 'x' : index + 1 }st`">{{ index + 1 }}</label><span>{{ item.title }}</span>
+        </span>
+        <p class="text-[12px] ml-[30px] flex mt-[2px]">
           <span class="split desc">{{ item.date }}</span>
           <span class="desc">{{ item.type }}</span>
         </p>
@@ -84,7 +77,7 @@ export default defineComponent({
       }
     }
     return {
-      hots: store.news.sort((a, b) => a.index - b.index).slice(0, 10),
+      hots: store.news.sort((a, b) => b.index - a.index).slice(0, 10),
       ...toRefs(store),
       ...toRefs(state)
     }
@@ -124,33 +117,31 @@ export default defineComponent({
   color: var(--description-font-color)
 }
 
-.no::before {
+.no {
   display: inline-flex;
   width: 20px;
   justify-content: center;
   align-items: center;
-
   margin-right: 10px;
 }
 
-.n1st::before {
-  content: '1';
+.n1st {
+  content: '';
   background: #F56C6C;
 }
 
-.n2st::before {
-  content: '2';
+.n2st {
+  content: '';
   background: #67C23B;
 }
 
-.n1st::before {
-  content: '1';
-  background: #F56C6C;
+.n3st {
+  content: '';
+  background: #409EFF;
 }
 
-.n3st::before {
-  content: '3';
-  background: #409EFF;
+.nxst {
+  content: '';
 }
 
 .self-introduce {
@@ -171,6 +162,18 @@ export default defineComponent({
   box-shadow: 0px 1px 0px rgba(255,255,255,.1), inset 0px 1px 1px rgba(0,0,0,.7);
   border-radius: 50%;
   margin: 0 5px;
+  cursor: pointer;
+}
+
+.weixin_popover img {
+  display: none;
+  max-width: 90px;
+  left: calc((63px - 90px)/2);
+  object-fit: contain;
+}
+
+.weixin_popover:hover img {
+  display: flex;
 }
 
 a.icon_email {
