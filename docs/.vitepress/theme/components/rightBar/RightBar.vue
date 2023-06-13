@@ -16,9 +16,9 @@
           trigger="hover"
           content="this is content, this is content, this is content"
         >
-          <!-- <template #default>
+          <template #default>
             <img src="../../assets/weixin_qrcode.png">
-          </template> -->
+          </template>
           <template #reference>
             <a class="icon_weixin"></a>
           </template>
