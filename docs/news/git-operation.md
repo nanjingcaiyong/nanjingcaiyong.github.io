@@ -191,3 +191,27 @@ git bisect reset
 ```
 
 ## 撤销
+
+## Git 管道
+### 操作符
+**|**: 管道命令，用于将一串命令串联起来。前面命令的输出可以作为后面命令的输入，
+**grep**: 搜索过滤命令。使用正则表达式搜索文本
+**grep -E**: 匹配
+**grep -v -E**: 排除匹配到的
+**xargs**: 参数传递命令。用于将标准输入作为命令的参数传给下一个命令
+
+
+### 批量删除
+```sh
+# 删除当前分支外的所有分支
+git branch | xargs git branch -d
+
+# 删除模糊匹配到的所有分支
+git branch | grep 'dev*' | xargs git branch -d
+
+# 删除指定分支的所有分支
+git branch -a | grep -E 'master|develop' | xargs git branch -D
+
+# 删除排除外的所有分支
+git branch -a | grep -v -E 'master|develop' | xargs git branch -D
+```
