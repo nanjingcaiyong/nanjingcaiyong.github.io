@@ -5,7 +5,7 @@ import {
   ElCarouselItem,
   ElPopover,
   ElTimeline,
-  ElTimelineItem
+  ElTimelineItem,
  } from 'element-plus';
 import 'element-plus/dist/index.css';
 import { Carousel, News } from './components';

@@ -2,6 +2,11 @@
   visibility: visible
 }
 
+
+footer {
+  margin-top: 50px;
+}
+
 .fixed {
   position: fixed
 }
@@ -72,6 +77,10 @@
 
 .mt-\[25px\] {
   margin-top: 25px
+}
+
+.mt-\[50px\] {
+  margin-top: 50px
 }
 
 .mr-\[10px\] {
@@ -273,6 +282,10 @@
   font-weight: 800
 }
 
+.font-bold {
+  font-weight: bold;
+}
+
 .uppercase {
   text-transform: uppercase
 }
@@ -293,7 +306,15 @@
   outline-style: solid
 }
 
+.rounded-\[50\%\] {
+  border-radius: 50%;
+}
+
 @media (min-width: 768px) {
+  footer {
+    margin-top: 100px;
+  }
+  
   .md\:ml-\[24px\] {
     margin-left: 24px
   }
@@ -317,11 +338,27 @@
   .md\:w-\[70\%\] {
     width: 70%
   }
+  .md\:w-\[100px\] {
+    width: 100px;
+  } 
+  .md\:h-\[100px\] {
+    height: 100px;
+  }
 
   .md\:text-\[40px\] {
     font-size: 40px;
   }
+  .md\:mt-\[50px\] {
+    margin-top: 50px;
+  }
+  .md\:flex {
+    display: flex;
+  }
+  .md\:hidden {
+    display: none;
+  }
 }
+
 
 @media (min-width: 1280px) {
   .xl\:mt-\[60px\] {
@@ -353,12 +390,10 @@
   }
 }
 
-footer {
-  margin-top: 50px;
-}
-
-@media screen and (min-width: 768px) {
-  footer {
-    margin-top: 100px;
+@media screen and (min-width: 1560px) {
+  .xxl\:max-w-\[50\%\] {
+    max-width: 50%;
   }
 }
+
+

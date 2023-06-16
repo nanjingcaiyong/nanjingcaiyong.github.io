@@ -50,6 +50,10 @@ const config = defineConfig({
           {
             text: 'c端工具库',
             link: 'https://nanjingcaiyong.github.io/rich-js/'
+          },
+          {
+            text: '组件库',
+            link: 'https://nanjingcaiyong.github.io/rich-ui/'
           }
         ]
       }
