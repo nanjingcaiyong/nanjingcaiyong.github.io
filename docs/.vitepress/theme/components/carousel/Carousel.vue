@@ -1,11 +1,5 @@
 <template>
   <div indicator-position="outside">
-    <!-- <div 
-      v-if="isMobile"  
-      class="pb-[70%] xl:pb-[30%] relative h-full relative"
-    >
-      <img src="../../assets/home_swiper1.jpg" class="absolute w-full h-full object-cover">
-    </div> -->
     <el-carousel 
       class="pb-[70%] xl:pb-[30%] relative h-0"
     >
@@ -24,16 +18,10 @@
   </div>
 </template>
 <script>
-import { defineComponent, ref } from 'vue';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'Carousel',
-  setup () {
-    const isMobile = ref(window.innerWidth <= 768)
-    return  {
-      isMobile
-    }
-  }
 })
 </script>
 
