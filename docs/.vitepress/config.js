@@ -20,15 +20,15 @@ const config = defineConfig({
         items: [
           {
             text: 'css',
-            link: '/large-front-end/css'
+            link: '/large-front-end/css/'
           },
           {
             text: 'html',
-            link: '/large-front-end/html'
+            link: '/large-front-end/html/'
           },
           {
-            text: 'es6',
-            link: '/large-front-end/es6'
+            text: 'javascript',
+            link: '/large-front-end/js/'
           },
         ]
       },
@@ -81,10 +81,10 @@ const config = defineConfig({
       message: 'Released under the MIT License.',
       copyright: 'Copyright © 2022-present yong.cai'
     },
-    search: {
-      provider: 'local'
-    }
-  }
+    // search: {
+    //   provider: 'local'
+    // }
+  },
 })
 
 export default config
