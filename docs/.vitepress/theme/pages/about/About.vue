@@ -77,63 +77,10 @@
 
 <script>
 import { defineComponent, reactive, toRefs } from 'vue';
+import { useStore } from '../../dataBase/store'
 export default defineComponent({
   setup() {
-    const store = reactive({
-      experiences: [{
-        company: 'Cupshe',
-        job: '前端开发工程师',
-        date: '2021.03 ～ 至今',
-        tags: [
-          'vue',
-          'nodejs',
-          'express',
-          'typescript',
-          'koa',
-          'sequelize',
-          'mysql',
-          'webpack',
-          'rollup',
-          'vite',
-          'es6',
-          'css',
-          'html5',
-        ]
-      }, {
-        company: '艾佳生活',
-        job: '前端开发工程师',
-        date: '2019.07 ~ 2021.03',
-        tags: [
-          'vue',
-          'nodejs',
-          'express',
-          'typescript',
-          'react',
-          'webpack',
-          'nuxt',
-          'uniapp',
-          'antd',
-          'es6',
-          'css',
-          'html5',
-          'pixijs',
-        ]
-      }, {
-        company: '江苏华博',
-        job: '前端开发工程师',
-        date: '2015.09 ~ 2019.06',
-        tags: [
-          'vue',
-          'jquery',
-          'nodejs',
-          'express',
-          'typescript',
-          '.NET',
-          'SqlServer',
-          'IIS'
-        ]
-      }]
-    });
+    const store = useStore()
     function getRGB() {
       let r = Math.floor(Math.random() * 256);
       let g = Math.floor(Math.random() * 256);
