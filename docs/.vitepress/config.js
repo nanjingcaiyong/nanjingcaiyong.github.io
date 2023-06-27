@@ -3,9 +3,9 @@ const config = defineConfig({
   base: '/',
   lang: 'zh-CN',
   title: '一颗白菜',
-  description: 'vitepress document basic framework',
-  lastUpdated: true,
+  description: '一颗白菜的博客',
   themeConfig: {
+    logo: '/logo.png',
     nav:  [
       { 
         text: '关于我', 
@@ -62,20 +62,11 @@ const config = defineConfig({
       pattern: 'https://github.com/nanjingcaiyong/vitepress-starter/edit/main/docs/:path',
       text: '编辑页面'
     },
-    algolia: {
-      apiKey: '63e30509d0698684b33ffd93f7e7ffff',
-      appId: 'PX4T8MU9V4',
-      indexName: 'vitepress-starter',
-      algoliaOptions: {
-        hitsPerPage: 10,
-      },
-    },
-    // github
     socialLinks: [
       { 
         icon: 'github', 
         link: 'https://github.com/nanjingcaiyong/vitepress-starter'
-      }
+      },
     ],
     footer: {
       message: 'Released under the MIT License.',

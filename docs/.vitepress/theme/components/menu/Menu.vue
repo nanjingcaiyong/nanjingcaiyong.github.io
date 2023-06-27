@@ -1,17 +1,24 @@
 <template>
   <main class="doc-menu">
-    <div class="vp-doc _large-front-end_css_" style="position: relative;">
+    <div 
+      class="vp-doc _large-front-end_css_" 
+      style="position: relative;"
+    >
       <div>
-        <h1 id="css相关" tabindex="-1">
+        <h1 :id="menu.title" tabindex="-1">
           {{ menu.title }} <a class="header-anchor" :href="`#${menu.title}`" aria-hidden="true">#</a>
         </h1>
         <p>{{ menu.description }}</p>
-        <h2 id="目录" tabindex="-1">目录<a class="header-anchor" href="#目录" aria-hidden="true">#</a></h2>
-        <ul>
-          <li v-for="item in list">
-            <a :href="item.link">{{ item.title }}</a>
-          </li>
-        </ul>
+        <template v-if="list.length > 0">
+          <h2 id="目录" tabindex="-1">目录<a class="header-anchor" href="#目录" aria-hidden="true">#</a></h2>
+          <ul>
+            <li v-for="item in list">
+              <a :href="item.link">{{ item.title }}</a>
+            </li>
+          </ul>
+        </template>
+        <p v-else>努力写作中……</p>
+
       </div>
     </div>
     <el-pagination 
