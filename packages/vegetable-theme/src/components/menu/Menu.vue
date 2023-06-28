@@ -48,7 +48,6 @@ export default defineComponent({
     })
     const menu = page.value?.frontmatter?.menu || []
     state.totalPage = Math.ceil((menu.list?.length || 0) / state.pageSize);
-    console.log(state.totalPage)
    
     const onChangePage = (index) => {
       state.pageIndex = index;
