@@ -2,6 +2,15 @@ import { reactive } from 'vue';
 const store = reactive({
   news: [
     {
+      title: 'mac 常用快捷键',
+      content: '总结了常用的 mac 快捷键，包含vscode，浏览器等',
+      img: '',
+      type: '大前端',
+      date: '2023-06-28',
+      link: '/news/mac-keys',
+      index: 6,
+    },
+    {
       title: '常用的 git 操作',
       content: '一些常用的 git 操作，例如：分支、提交、撤销、标签、暂存、合并等……',
       img: '',
