@@ -2,6 +2,15 @@ import { reactive } from 'vue';
 const store = reactive({
   news: [
     {
+      title: 'package.json 字段详解',
+      content: '总结了package.json中各字段的作用，以及在开发中的使用场景',
+      img: '',
+      type: '大前端',
+      date: '2023-06-28',
+      link: '/news/package-json',
+      index: 7,
+    },
+    {
       title: 'mac 常用快捷键',
       content: '总结了常用的 mac 快捷键，包含vscode，浏览器等',
       img: '',
