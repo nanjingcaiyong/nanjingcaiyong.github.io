@@ -1,0 +1,399 @@
+.visible {
+  visibility: visible
+}
+
+
+footer {
+  margin-top: 50px;
+}
+
+.fixed {
+  position: fixed
+}
+
+.absolute {
+  position: absolute
+}
+
+.relative {
+  position: relative
+}
+
+.sticky {
+  position: sticky
+}
+
+.top-0 {
+  top: 0;
+}
+
+.top-\[10px\] {
+  top: 10px
+}
+.top-\[92px\] {
+  top: 92px
+}
+
+.bottom-0 {
+  bottom: 0;
+}
+
+.bottom-\[60px\] {
+  bottom: 60px;
+}
+
+.left-0 {
+  left: 0;
+}
+
+.right-0 {
+  right: 0;
+}
+
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto
+}
+
+.mt-\[2px\] {
+  margin-top: 2px;
+}
+
+.mt-\[6px\] {
+  margin-top: 6px;
+}
+
+.mt-\[10px\] {
+  margin-top: 10px;
+}
+
+.mt-\[16px\] {
+  margin-top: 16px;
+}
+
+.mt-\[20px\] {
+  margin-top: 20px
+}
+
+.mt-\[25px\] {
+  margin-top: 25px
+}
+
+.mt-\[50px\] {
+  margin-top: 50px
+}
+
+.mr-\[10px\] {
+  margin-right: 10px;
+}
+
+.mb-\[5px\] {
+  margin-bottom: 5px
+}
+
+.mb-\[8px\] {
+  margin-bottom: 8px
+}
+
+.mb-\[10px\]{
+  margin-bottom: 10px;
+}
+
+.mb-\[16px\] {
+  margin-bottom: 16px
+}
+
+.mb-\[25px\] {
+  margin-bottom: 25px
+}
+
+.ml-\[12px\] {
+  margin-left: 12px
+}
+
+.ml-\[30px\] {
+  margin-left: 30px;
+}
+
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.block {
+  display: block
+}
+
+.flex {
+  display: flex
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.grid {
+  display: grid
+}
+
+.text-center {
+  text-align: center;
+}
+
+.\!hidden {
+  display: none !important
+}
+
+.hidden {
+  display: none
+}
+
+.h-0 {
+  height: 0px
+}
+
+.h-full {
+  height: 100%
+}
+
+.w-full {
+  width: 100%
+}
+
+.w-\[100px\] {
+  width: 100px
+}
+
+.w-\[25\%\] {
+  width: 25%
+}
+
+.w-\[28\%\] {
+  width: 28%
+}
+
+.w-\[30\%\] {
+  width: 30%
+}
+
+
+
+.max-w-\[90\%\] {
+  max-width: 90%
+}
+
+.max-w-\[95\%\] {
+  max-width: 95%
+}
+
+.flex-shrink {
+  flex-shrink: 1
+}
+
+.flex-grow {
+  flex-grow: 1
+}
+
+
+.flex-wrap {
+  flex-wrap: wrap
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.border {
+  border-width: 1px
+}
+
+.bg-gray-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(107 114 128 / var(--tw-bg-opacity))
+}
+
+.object-contain {
+  -o-object-fit: contain;
+  object-fit: contain
+}
+
+.object-cover {
+  -o-object-fit: cover;
+  object-fit: cover
+}
+
+.pb-\[70\%\] {
+  padding-bottom: 70%
+}
+
+.text-\[12px\] {
+  font-size: 12px
+}
+
+.text-\[14px\] {
+  font-size: 14px
+}
+
+.text-\[18px\] {
+  font-size: 18px
+}
+.text-\[22px\] {
+  font-size: 22px
+}
+
+.text-\[26px\] {
+  font-size: 26px;
+}
+
+.text-\[40px\] {
+  font-size: 40px;
+}
+
+.font-\[600\] {
+  font-weight: 600
+}
+
+.font-\[800\] {
+  font-weight: 800
+}
+
+.font-bold {
+  font-weight: bold;
+}
+
+.uppercase {
+  text-transform: uppercase
+}
+
+.leading-none {
+  line-height: 1
+}
+
+.leading-\[2\.5\] {
+  line-height: 2.5;
+}
+
+.leading-\[20px\] {
+  line-height: 20px;
+}
+
+.outline {
+  outline-style: solid
+}
+
+.rounded-\[50\%\] {
+  border-radius: 50%;
+}
+
+@media (min-width: 768px) {
+  footer {
+    margin-top: 100px;
+  }
+  
+  .md\:ml-\[24px\] {
+    margin-left: 24px
+  }
+
+  .md\:block {
+    display: block
+  }
+
+  .md\:w-\[65\%\] {
+    width: 65%
+  }
+
+  .md\:w-\[67\%\] {
+    width: 67%
+  }
+
+  .md\:w-\[69\%\] {
+    width: 69%
+  }
+
+  .md\:w-\[70\%\] {
+    width: 70%
+  }
+  .md\:w-\[100px\] {
+    width: 100px;
+  } 
+  .md\:h-\[100px\] {
+    height: 100px;
+  }
+
+  .md\:text-\[40px\] {
+    font-size: 40px;
+  }
+  .md\:mt-\[50px\] {
+    margin-top: 50px;
+  }
+  .md\:flex {
+    display: flex;
+  }
+  .md\:hidden {
+    display: none;
+  }
+}
+
+
+@media (min-width: 1280px) {
+  .xl\:mt-\[60px\] {
+    margin-top: 60px
+  }
+
+  .xl\:max-w-\[60\%\] {
+    max-width: 60%
+  }
+
+  .xl\:max-w-\[50\%\] {
+    max-width: 50%
+  }
+
+  .xl\:max-w-\[70\%\] {
+    max-width: 70%
+  }
+
+  .xl\:max-w-\[80\%\] {
+    max-width: 80%
+  }
+
+  .xl\:max-w-\[75\%\] {
+    max-width: 75%
+  }
+
+  .xl\:pb-\[30\%\] {
+    padding-bottom: 30%
+  }
+}
+
+@media screen and (min-width: 1560px) {
+  .xxl\:max-w-\[50\%\] {
+    max-width: 50%;
+  }
+}
+
+

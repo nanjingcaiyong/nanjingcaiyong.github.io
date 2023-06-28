@@ -5,12 +5,12 @@
     >
       <el-carousel-item>
         <div class="h-full relative">
-          <img src="../../assets/home_swiper1.jpg" class="absolute w-full h-full object-cover">
+          <img src="../../../assets/home_swiper1.jpg" class="absolute w-full h-full object-cover">
         </div>
       </el-carousel-item>
       <el-carousel-item>
         <div class="h-full relative">
-          <img src="../../assets/home_swiper2.jpg" class="absolute w-full h-full object-cover">
+          <img src="../../../assets/home_swiper2.jpg" class="absolute w-full h-full object-cover">
         </div>
       </el-carousel-item>
     </el-carousel>

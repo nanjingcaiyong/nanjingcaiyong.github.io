@@ -11,7 +11,7 @@
         <a :href="user.email" class="icon_email"></a>
         <a :href="user.qq" class="icon_qq"></a>
         <div class="relative weixin_popover">
-          <img width="200" src="../../assets/weixin_qrcode.png" class="absolute bottom-[60px]">
+          <img width="200" src="../../../assets/weixin_qrcode.png" class="absolute bottom-[60px]">
           <a class="icon_weixin"></a>
         </div>
       </div>
@@ -177,15 +177,15 @@ export default defineComponent({
 }
 
 a.icon_email {
-  background: url(../../assets/email.png) no-repeat center;
+  background: url(../../../assets/email.png) no-repeat center;
 }
 
 a.icon_qq {
-  background: url(../../assets/qq.png) no-repeat center;
+  background: url(../../../assets/qq.png) no-repeat center;
 }
 
 a.icon_weixin {
   position: relative;
-  background: url(../../assets/weixin.png) no-repeat center;
+  background: url(../../../assets/weixin.png) no-repeat center;
 }
 </style>

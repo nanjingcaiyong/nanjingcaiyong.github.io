@@ -1,0 +1,16 @@
+{
+  "name": "@vegetable/theme",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.ts",
+  "module": "",
+  "scripts": {
+    "build": "pnpm --filter 'blogpress' build"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    ".": "./index.ts"
+  },
+  "author": "yong.cai",
+  "license": "MIT"
+}

@@ -12,7 +12,7 @@
         </div>
         <img 
           class="flex w-[100px] ml:w-[120px] object-contain ml-[12px] md:ml-[24px]" 
-          src="../../assets/news_1.jpg"
+          src="../../../assets/news_1.jpg"
         >
       </div>
     </a>
