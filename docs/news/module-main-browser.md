@@ -51,10 +51,7 @@ npx webpack init
     "webpack": "^5.88.0",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^4.15.1"
-  },
-  "workspaces": [
-    "packages/*"
-  ]
+  }
 }
 
 ```
@@ -64,7 +61,7 @@ npx webpack init
 ```txt
 ├── packages
     ├── pk1
-        ├── index.js        
+        ├── index.js
         ├── index.mjs.js
         ├── index.browser.js
         ├── package.json
@@ -106,12 +103,19 @@ export const log = function () {
 }
 ```
 
-3、在 src/index.js中引入依赖包 `pk1`, 我们先以 `commonjs` 的方式引入
+3、在 src/index.cjs 和 src/index.mjs 中引入依赖包 `pk1`
 ```js
+// src/index.cjs
 const { log } = require('pk1')
 log()
 ```
- 
+
+```js
+// src/index.mjs
+import { log } from 'pk1'
+log()
+```
+
 这是我们好奇依赖包 `pk1` 是怎么来的？
  
 下面我们修改修改根目录下的package.json，添加字段 `workspaces`，代码如下：
@@ -142,8 +146,8 @@ log()
     "packages/*"
   ]
 }
-
 ```
+
 具体对 `workspaces` 字段解释，请参考我的博客package.json一文
     
 配置完成后，执行`npm link ./packages/pk1`
@@ -154,30 +158,28 @@ log()
 
 ### node 环境
 
-回顾一下，我们当前src/index.js是通过commonjs对模块进行引入的
+回顾一下，我们当前src/index.cjs 和 src/index.mjs 代码
 ```js
+// src/index.cjs
 const { log } = require('pk1')
 log()
-```
 
-下面我们执行代码 `node index.js`, 发现打印出来的是 `this is main entry`，也就是我们 `main` 字段指定的入口。下面我们把 引用方式改成 es6，代码如下:
-```
-import { log } from 'pk1';
+// src/index.mjs
+import { log } from 'pk1'
 log()
 ```
-改代码的同时，我们在根目录的package.json添加`"type": "module"`, 或者把index.js改成index.mjs，告诉node我要用 `esm` 做模块解析。
 
-接着我们同样执行`node index.js`， 发现打印的还是 `this is main entry`。
+下面我们执行代码 `node index.cjs`, 发现打印出来的是 `this is main entry`，再执行代码 `node index.mjs`, 打印的还是 `this is main entry`，也就是我们 `main` 字段指定的入口。
 
 所以得出第一个结论，在 `node环境` 不论用 `ESM` 或 `commonjs`都是优先采用 `main` 字段作为入口。
 
-那么如果我们把 `main` 字段给删了呢？会不会采用 `module` 或 `browser`字段指定的入口。
+那么如果我们把 `main` 字段给删了，会不会采用 `module` 或 `browser` 字段指定的入口呢？
 
-接下来我们删除 `packages/pk1/package.json` 中的 `main` 字段，然后接着执行 `node index.js`，发现打印出来的仍是 `this is main entry`。最后我们删除`packages/pk1/index.js`，发现控制台报错了。
+接下来我们删除 `packages/pk1/package.json` 中的 `main` 字段，然后接着执行 `node index.cjs`，发现打印出来的是 `this is main entry`；再执行 `node index.mjs`，打印结果仍是 `this is main entry`；最后我们删除`packages/pk1/index.js`，发现控制台报错了。
 
-这样得出了第二个结局，在 `node环境` 只会使用 `main` 字段指定的入口文件，如果没有配置 `main` 字段，默认采用当前包根目录下的 index.js。
+这样得出了第二个结论，在 `node环境` 只会使用 `main` 字段指定的入口文件，如果没有配置 `main` 字段，默认采用当前包根目录下的 index.js。
 
-测试完，我们恢复删除的`"main": "index.js"`, 恢复`packages/pk1/index.js`文件， 删除刚才在package.json 中添加 `"type": "module"`
+测试完，我们恢复删除的`"main": "index.js"`, 恢复`packages/pk1/index.js`文件。
 
 
 ### 浏览器环境

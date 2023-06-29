@@ -98,7 +98,61 @@ main、module、browser 区别
 - 在 `浏览器` 环境下，加载的优先级 `browser > module > main`, 比如如果 browser 未配置，则采用 module；如果 module 未配置，则采用 main。注意，如果使用打包工具如 webpack，通过 resolve.mainFields 是会覆盖上述优先级。
 - 在 `node` 环境下，只会采用 `main` 配置，如果没有则报错
 
+### types
+
+导出声明文件
 
 ### exports
 
-### types
+在 node v12.7.0 后提供了对于入口文件的替代品字段，它的优先级是高于任何入口字段的（module、main、browser）
+
+**路径封装**
+
+首先 exports 字段可以对于包中导出的路径进行封装
+
+比如下面的代码：
+
+```json
+{
+  // 表示该包仅存在默认导出，默认导出为 ./index.js
+  "exports": "./index.js"
+}
+// 上述的写法相当于
+{
+  "exports": {
+    ".": "./index.js"
+  }
+}
+```
+
+当我们定义了该字段后，该 Npm 包仅支持引入包自身，禁止引入其他子路径，相当于对于子路径的封装
+
+换句话说，我们仅仅只能引入 index.js。比如我们引入了未在 exports 中定义的模块。
+
+```js
+// Error
+// 此时控制台会报错，找不到该模块(无法引入在 exports 未定义的子模块路径)
+import Rich from 'rich-js/src/test.js'
+// correct
+import Rich from 'rich-js'
+```
+
+同时在使用 exports 关键字时，可以通过 . 的方式来定义主入口文件：
+```json
+{
+  "exports": {
+    // . 表示引入包默认的导出文件路径， 比如 import qingfeng from 'qingfeng'
+    // 这里的 . 即表示未携带任何路径的 qingfeng，相当于默认导出 ./index.js 文件的内容
+    ".": "./index.js",
+    // 同时额外定义一个可以被引入的子路径
+    // 可以通过 import qingfengSub from 'qingfeng/submodule.js' 进行引入 /src/submodule.js 的文件
+    "./submodule.js": "./src/submodule.js"
+  }
+}
+```
+
+**条件导出**
+
+同样， exports 字段的强大不仅仅在于它对于包中子模块的封装。这个字段同时提供了一种根据特定条件映射到不同路径的方法
+
+比如，通常我们编写的 NPM 包支持被 ESM 和 CJS 两种方式同时引入，根据不同的引入方式来寻找不同的入口文件
