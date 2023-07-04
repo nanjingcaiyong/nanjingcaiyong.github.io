@@ -1,6 +1,6 @@
 现在越来越多的项目使用 `monorepo`，最近在开发组件库的时候，正好用到了，这里记录一下。
 
-## 介绍
+## **介绍**
 现在像组件库、mvvm框架、脚手架等许多优秀开源的作品都在使用 monorepo 来管理代码。
 
 ![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/a8a06b47e7b545698644cc07e19d0ad3~tplv-k3u1fbpfcp-watermark.image?)
@@ -10,9 +10,9 @@
 
 ![image.png](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/6b0fd265900f438b9c94ea599fde5384~tplv-k3u1fbpfcp-watermark.image?)
 
-以组件库分举例，组件库一般为几个部分，`文档`、`组件`、`图标`、`指令`、`主题`等，某些部分可能是相互依赖的；并且我们既要每部分都独立发布，又要考虑本地调试、开发，思考一下如何设计项目结构？
+以组件库举例，组件库一般为几个部分，`文档`、`组件`、`图标`、`指令`、`主题`等，某些部分可能是相互依赖的；并且我们既要每部分都独立发布，又要考虑本地调试、开发，思考一下如何设计项目结构？
 
-按照传统模式，我们可能把每个部分都作为独立仓库 和 npm包来管理，然后通过 link 软链的方式来调试，很显然这样在开发和代码仓库协同上肯定有弊端，而 `monorepo` 正式解决这种问题的，将相关项目放在一个仓库中
+按照传统模式，我们可能把每个部分都作为独立仓库 和 npm包来管理，然后通过 link 软链的方式来调试，很显然这样在开发和代码仓库协同上肯定是有劣势的，而 `monorepo` 正式解决这种问题的，将相关项目放在一个仓库中。
 
 `monorepo` 是 一种项目代码管理方式，指单个仓库中管理多个项目，有助于简化代码共享、版本控制、构建和部署等方面的复杂性，并提供更好的可重用性和协作性。
 
@@ -44,7 +44,7 @@ packages:
   - 'packages/*'
 ```
 
-### 创建子包
+### 创建 `package1` 子包
 
 我们先创建第一个子包，名为 `package1`
 ```sh
@@ -174,6 +174,8 @@ declare module 'package1/global' {
         
 ```
 
+### 创建 `package2` 子包
+
 接下来我们再创建一个子包，名为 `package2`，并且该包依赖 `package1`
 ```sh
 mkdir packages/package2 && cd packages/package2 && pnpm init && cd ../../
@@ -264,6 +266,8 @@ declare module "package2/global" {
 }
 ```
 
+### `package2` 内部依赖安装
+
 子包 `package2` 文件创建完成，下面需要安装对 `package1` 的依赖
 ```sh
 # 在 子包 package2 中 安装 package1
@@ -312,14 +316,16 @@ pnpm install package1 --filter package2
     ├── package2
         ├── index.mjs
         ├── index.cjs
-        ├── index.d.ts
+        ├── index.d.**ts**
         ├── global.mjs
         ├── global.cjs
         ├── global.d.ts
         ├── package.json
 ```
 
-在项目根目录创建入口文件
+## 创建调试代码
+
+### 创建入口文件
 ```js
 // index.mjs
 import { calc } from 'package2'
@@ -334,10 +340,12 @@ const pk2 = require('package2/global')
 console.log(pk2.calc(1,2))
 ```
 
+### 安装 `package2` 依赖包
 ```sh
 pnpm install ./packages/package2 -w
 ```
 
+### 调试
 
 ```sh
 node index.mjs
@@ -346,3 +354,8 @@ node index.mjs
 node index.cjs
 # 2
 ```
+
+
+## 总结
+
+这里使用 pnpm 的 workspace 来创建 monorepo 代码仓库，此外目前主流的还有 yarn/npm/yarn workspace、 [learn](https://lerna.js.org/)、 [nx](https://nx.dev/) 、[turborepo](https://turbo.build/)
