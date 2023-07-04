@@ -2,6 +2,15 @@ import { reactive } from 'vue';
 const store = reactive({
   news: [
     {
+      title: '基于pnpm 创建 monorepo 项目',
+      content: '现在越来越多的项目使用 monorepo，最近在开发组件库的时候，正好用到了，这里记录一下。现在像组件库、mvvm框架、脚手架等许多优秀开源的作品都在使用 monorepo 来管理代码。',
+      img: '',
+      type: '大前端',
+      date: '2023-07-04',
+      link: '/news/pnpm-monorepo',
+      index: 12,
+    },
+    {
       title: 'package.json 中 module、main、browser 的优先级',
       content: '前端开发中使用到 npm 包那可算是家常便饭，而使用到 npm 包总免不了接触到 package.json 包配置文件。',
       img: '',

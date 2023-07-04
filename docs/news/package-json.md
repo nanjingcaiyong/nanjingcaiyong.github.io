@@ -24,14 +24,25 @@
 - MIT
 
 ### repository
+
+指定一个代码存放地址，对想要为你的项目贡献代码的人有帮助
 - type
 - url 仓库地址
+- directory 如果是 `monorepo` 需要指定所在目录
 
-## type
+### type
 - commonjs
 - module
 
 ### bugs
+
+### private
+
+是否私有化。如果设为 `true`，执行 `npm publish` 会被 npm 拒绝，这是为了防止意外的将私有模块无意的发布出去
+
+### fundig
+
+赞助商
 
 ## 依赖配置
 
@@ -108,12 +119,16 @@ main、module、browser 区别
 - 在 `node` 环境下，只会采用 `main` 配置，如果没有则报错
 
 ### types
+导出 主声明文件
 
-导出声明文件
+### typiping
+"typings" 与 "types" 具有相同的意义
 
 ### exports
 
 在 node v12.7.0 后提供了对于入口文件的替代品字段，它的优先级是高于任何入口字段的（module、main、browser）
+
+当打包工具支持exports字段时（webpack、Rollup 等），以上main，browser，module，types四个字段都被忽略。
 
 **路径封装**
 
@@ -161,6 +176,7 @@ import Rich from 'rich-js'
 ```
 
 **条件导出**
+
 
 同样， exports 字段的强大不仅仅在于它对于包中子模块的封装。这个字段同时提供了一种根据特定条件映射到不同路径的方法
 
@@ -257,3 +273,34 @@ exports 还支持多层嵌套，支持在运行环境中嵌套不同的引入方
   }
 }
 ```
+
+### typesVersions
+
+typesVersions 是对主声明文件路径的映射
+
+```json
+{
+  "exports": {
+    ".": {
+      "import": ""
+    }
+  },
+}
+```
+
+
+## 开发配置
+
+### workspaces
+
+### scripts
+
+### lint-staged（非官方）
+
+### browserslist（非官方）
+### sideEffects（非官方）
+指示包是否具有副作用，协助Webpack，Rollup等进行tree shaking。多数情况下可以直接设置为false，这样打包工具就会自动删除未被import的代码
+
+但是有些情况例外：
+- 有一些特定的模块文件，它们执行一些副作用操作，如注册全局事件监听器、修改全局状态等。
+- 告诉构建工具不要将样式文件排除在无用代码消除的优化范围之外
