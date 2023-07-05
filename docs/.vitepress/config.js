@@ -28,8 +28,12 @@ const config = defineConfig({
           },
           {
             text: 'javascript',
-            link: '/large-front-end/js/'
+            link: '/large-front-end/javascript/'
           },
+          {
+            text: 'typescript',
+            link: '/large-front-end/typescript/'
+          }
         ]
       },
       { 

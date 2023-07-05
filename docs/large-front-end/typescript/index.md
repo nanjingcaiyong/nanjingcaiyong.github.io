@@ -1,9 +1,11 @@
 ---
 layout: page
 menu: {
-  title: HTML相关,
-  description: 记录开发中所遇问题及其解法,
-  list: []
+  title: typescript相关,
+  description: 记录 typescript 在使用技巧,
+  list: [
+    { title: 'typescript 声明文件', link: ./declaration }
+  ]
 }
 ---
 
