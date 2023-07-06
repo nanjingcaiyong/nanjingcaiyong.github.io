@@ -2,6 +2,15 @@ import { reactive } from 'vue';
 const store = reactive({
   news: [
     {
+      title: 'vue 实现快速实现 Sticky 组件',
+      content: '我们在实际开发过程中，多多少少接触过吸顶的交互场景。相信大家第一感觉就是很简单啊，用 css 的 sticky 完全满足，我也是这么想的。但是实际在使用的时候会发现 sticky 在快速滑动的时候会有细微的 抖动，在 移动端尤其明显。',
+      img: '',
+      type: '大前端',
+      date: '2023-07-06',
+      link: '/news/vue-sticky',
+      index: 13,
+    },
+    {
       title: '基于pnpm 创建 monorepo 项目',
       content: '现在越来越多的项目使用 monorepo，最近在开发组件库的时候，正好用到了，这里记录一下。现在像组件库、mvvm框架、脚手架等许多优秀开源的作品都在使用 monorepo 来管理代码。',
       img: '',
