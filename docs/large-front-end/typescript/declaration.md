@@ -233,20 +233,126 @@ package.json
   import LibB from 'packages/b'
   ```
 
+### 类型校验
+- strictBindCallApply
+  默认值为 `true`
+  ```ts
+  function sum (num1: number, num2: number) {
+    return num1 + num2
+  }
+
+  sum.apply(null, [1, 2, 3]); // 
+  /* 报错：
+    类型“[number, number, number]”的参数不能赋给类型“[num1: number, num2: number]”的参数。
+      源具有 3 个元素，但目标仅允许 2 个 
+  */
+
+  sum.call(null, 1, 2, 3);
+  /* 报错：
+    应有 3 个参数，但获得 4 个 
+  */
+
+  sum.bind(null, 1, 2, 3)
+  /* 报错：
+    应有 3 个参数，但获得 4 个 
+  */
+
+  ```
+
+  禁用对bind、call、apply入参数量校验（"strictBindCallApply": false）；或者将入参改为`rest`方式
+  ```ts
+  function sum (...args: number[]) {
+    return args.reduce<number>((total, num) => total + num, 0)
+  }
+  sum.apply(null, [1, 2, 3])
+  sum.apply(null, 1, 2, 3)
+  sum.bind(null, 1, 2, 3)
+  ```
+
+- strictFunctionTypes
+  协变：子类赋值给父类，逆变：父类赋值给子类。TS是允许双变的，默认为（true，不允许函数入参协变）
+
+  一般要求入参`逆变`，出参`协变`
+  ```ts
+  interface Animal {
+    age: number
+    eat: () => void
+  }
+
+  interface Dog {
+    age: number
+    eat: () => void
+    bark: () => void
+  }
+
+  let visitAnimal = (animal: Animal): Dog => {
+    return {
+      age: animal.age,
+      eat: animal.eat,
+      bark: () => console.log('汪汪')
+    }
+  }
+
+  let visitDog = (dog: Dog): Animal => {
+    return {
+      age: dog.age,
+      eat: dog.eat
+    }
+  }
+
+  visitDog = visitAnimal; // 兼容
+  visitAnimal = visitDog; // 不兼容
+  ```
+
+  为什么 visitAnimal 可以赋值给 visitDog，反之则会报错？改写一下上面的函数：
+  ```ts
+  // before
+  visitDog = visitAnimal
+
+  // after
+  visitDog = (dog: Dog): Animal => {
+    // 入参 dog 满足 visitAnimal 入参需要的 Animal 类型
+    // 并且 visitAnimal 返回值 dog 包含更多的信息，也符合 visitDog 返回值要求的 Animal 类型
+    const dog = visitAnimal(dog);
+    return dog.age;
+  }
+  ```
+  可以理解为在之前调用 `visitDog` 的时候传入的是 `Dog类型` ({age: 8, eat:() => console.log('吃'), bark: () => console.log('旺旺')})。现在 把 `visitAnimal` 赋值给 `visitDog`，入参类型由 `Dog` 变成了 `Animal`，而之前传的参数值不变({age: 8, eat: () => console.log('吃'), bark: () => console.log('旺旺')}), 再次调用的时候是可以赋值给 Animal 类型的；
+  
+  而回参在被使用的时候如 `const dog = visitDog();console.log(dog.age);dog.eat()`，回参类型由 `Animal` 变成了 `Dog`，因为 `Dog` 类型具备 `Animal` 类型的所有字段，所以外层调用仍然是安全的。
+
+  反之则不行，我们可以按照上面的方法来改写：
+  ```ts
+  // before
+  visitAnimal = visitDog
+
+  // after 
+  visitAnimal = (animal: Animal): Dog => {
+    // 入参 animal 不满足 visitDog 入参要求的 Dog 类型
+    // 并且 visitDog 返回值 animal 不符合 visitDog 返回值要求的 Dog 类型。如果调用 animal.bark() 会导致程序抛错
+    const animal = visitDog(animal); 
+    return animal;
+  }
+  ```
+
 ### tsconfig.json 配置文件
 
 ```json
 {
     "compilerOptions": {
+      "module": "ES6",                           // "None"， "CommonJS"， "AMD"， "System"， "UMD"， "ES6"，"ES2015"，"ESNext"
+      "rootDir": "",
+      "baseUrl": ".",                            // 全局相对模块引入的基础路径
+      "paths": [],                               //
       "target": "ES5",                           // 指定编译后生成的的JS版本: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019' or 'ESNEXT'
       "lib": ["DOM", "ES2016", "ES2017.Object"], // 和 target 一起使用。编译成target 所需的 polyfill
-      "module": "ES6",                           // "None"， "CommonJS"， "AMD"， "System"， "UMD"， "ES6"，"ES2015"，"ESNext"
       "declarationDir": "./dist/types",          // 输出的声明文件目录
-      "baseUrl": ".",                            // 全局相对模块引入的基础路径
       "outDir": "dist",                         // 默认情况下，ts编译后的js文件，与源文件都在同一个目录下。使用outDir选项可以指定编译后的文件所在的目录。清理之前编译生成的js文件。
-      "rootDir": "",
       "noEmit": false,                          // 是否输出声明文件。true: 不生成声明文件，false: 生成声明文件
-
+      
+      /* Type Checking */
+      "strict": true,
+      "noImplicitAny": true,                   // 是否必须显式声明 `any`。true: 是(默认), false: 否
       "experimentalDecorators": true,           // 是否启用装饰器
     },
     "files": [],                        // 指定需要被编译的文件列表。这里不能指定目录，只能是文件，可以省略.ts 后缀。适合需要编译的文件比较少的情况。默认值为 false；
