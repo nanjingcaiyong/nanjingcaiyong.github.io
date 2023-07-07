@@ -126,7 +126,7 @@ main、module、browser 区别
 
 ### exports
 
-导出配置，详细介绍见[package.json 之 exports]('/news/package-json-exports')
+导出配置，详细介绍见[package.json 之 exports](./package-json-exports)
 
 ### typesVersions
 
