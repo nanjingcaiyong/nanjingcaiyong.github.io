@@ -2,6 +2,15 @@ import { reactive } from 'vue';
 const store = reactive({
   news: [
     {
+      title: 'package.json 之 exports',
+      content: '',
+      img: '',
+      type: '大前端',
+      date: '2023-07-07',
+      link: '/news/package-json-exports',
+      index: 14,
+    },
+    {
       title: 'vue 实现快速实现 Sticky 组件',
       content: '我们在实际开发过程中，多多少少接触过吸顶的交互场景。相信大家第一感觉就是很简单啊，用 css 的 sticky 完全满足，我也是这么想的。但是实际在使用的时候会发现 sticky 在快速滑动的时候会有细微的 抖动，在 移动端尤其明显。',
       img: '',
