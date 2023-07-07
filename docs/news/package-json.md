@@ -126,54 +126,135 @@ main、module、browser 区别
 
 ### exports
 
-在 node v12.7.0 后提供了对于入口文件的替代品字段，它的优先级是高于任何入口字段的（module、main、browser）
+在 `node@12.7.0` 后提供了对于入口文件的替代品字段，它的优先级是 `高于` 任何入口字段的（module、main、browser）
 
 当打包工具支持exports字段时（webpack、Rollup 等），以上main，browser，module，types四个字段都被忽略。
 
-**路径封装**
+**主入口导出**
 
-首先 exports 字段可以对于包中导出的路径进行封装
-
-比如下面的代码：
+类似 main 和 module 字段，我们可以使用下面的写法来配置一个模块没有写子路径时怎样导出的，也叫主入口：
 
 ```json
 {
-  // 表示该包仅存在默认导出，默认导出为 ./index.js
-  "exports": "./index.js"
-}
-// 上述的写法相当于
-{
+  "name": "xxx",
   "exports": {
     ".": "./index.js"
   }
 }
 ```
 
-当我们定义了该字段后，该 Npm 包仅支持引入包自身，禁止引入其他子路径，相当于对于子路径的封装
+对于上面的例子，可以换成简单写法
+```json
+{
+  "name": "xxx",
+  "exports": "./index.js"
+}
+```
 
-换句话说，我们仅仅只能引入 index.js。比如我们引入了未在 exports 中定义的模块。
+例如 `import x from 'xxx'` 其实会被解析到 `node_modules/xxx/index.js`
+
+当我们定义了该字段后，禁止引入其他子路径，例如模块`xxx`我们仅仅只能引入 index.js。那么我们引入了未在 `exports` 中定义的模块，nodejs 将报错。
 
 ```js
 // Error
 // 此时控制台会报错，找不到该模块(无法引入在 exports 未定义的子模块路径)
-import Rich from 'rich-js/src/test.js'
+import Rich from 'xxx/src/test.js'
 // correct
-import Rich from 'rich-js'
+import Rich from 'xxx'
 ```
 
-同时在使用 exports 关键字时，可以通过 . 的方式来定义主入口文件：
+**子路径导出**
+
+你可以像下面这样定义子路径模块的映射规则：
 ```json
 {
+  "name": "xxx",
   "exports": {
-    // . 表示引入包默认的导出文件路径， 比如 import qingfeng from 'qingfeng'
-    // 这里的 . 即表示未携带任何路径的 qingfeng，相当于默认导出 ./index.js 文件的内容
-    ".": "./index.js",
-    // 同时额外定义一个可以被引入的子路径
-    // 可以通过 import qingfengSub from 'qingfeng/submodule.js' 进行引入 /src/submodule.js 的文件
-    "./submodule.js": "./src/submodule.js"
+    "./add.js": "./src/add.js"
   }
 }
 ```
+
+没有声明的子路径不能使用：
+```js
+// 加载 ./node_modules/xxx/src/submodule.js
+import submodule from 'xxx/add.js';
+
+// Throws ERR_PACKAGE_PATH_NOT_EXPORTED
+import submodule from 'xxx/private-minus.js';
+
+```
+
+
+**导出多个子路径**
+例如我们重构 lodash，把所有的子路径模块，也就是 package.json 同级的的那一堆 js 模块放到 lib 文件夹。一种选择就是声明所有子路径：
+
+```json
+{
+  "name": "lodash",
+  "exports": {
+    "./add": "./lib/add.js",
+    "./multiply": "./lib/multiply.js",
+    "...": "..."
+  }
+}
+```
+
+但是由于 lodash 的模块非常多，这样处理会导致 package.json 非常臃肿。
+
+通过在子路径中使用通配符可以处理任意的嵌套子路径：
+
+```json
+{
+  "name": "lodash",
+  "exports": {
+    "./*": "./lib/*.js"
+  }
+}
+```
+
+在 node 官方文档中：
+- exports 可以写通配符 * 的路径例如 ./* 在英文术语里叫 pattern，也就是模式
+- exports 的 value ./lib/*.js 的英文术语叫 target pattern，也就是目标模式
+
+注意我们这里的 * 用的不是 glob 语法，在 glob 语法里面 * 表示任意的一层目录，但是在 exports pattern 中可以表示无限层任意路径。
+
+要读懂这个映射规则，我们可以这样理解：
+
+- 给定一个模块 id lodash/add
+- 使用模块名 lodash 替换左侧的 pattern ./* 中的 `.` ，得到 lodash/*
+- 把 pattern lodash/* 和模块 id lodash/add 做模式匹配，得到 * 的值就是 add
+- 将 target pattern ./lib/*.js 中的 * 替换第三步得到的 * 的值得到 ./lib/add.js，也就是相对于 lodash package 的相对路径
+- 把相对路径中的 `.` 替换为 lodash package 的绝对路径就能得到模块 id lodash/add 的绝对路径：/xxx/node_modules/lodash/lib/add.js
+
+**禁止模块导出**
+
+你可以用通过将一个模块的 target pattern 设置为 null 来禁止某个子路径被另一个模块导入：
+```json
+{
+  "name": "xxx",
+  "exports": {
+    "./forbidden": null
+  }
+}
+```
+
+**扩展名和文件夹模块问题**
+
+需要注意的是 nodejs 在通过 exports 解析模块时是不会做自动添加扩展名的操作，例如你写成下面这样是有问题的：
+```json
+{
+  "name": "lodash",
+  "exports": {
+    "./*": "./lib/*"
+  }
+}
+```
+
+使用上面的配置， lodash/add 会被解析到 xxx/node_modules/lodash/lib/add，如果是在 nodejs 环境下，由于模块必须带扩展名，它显然是有问题的。
+
+
+
 
 **条件导出**
 
@@ -213,81 +294,316 @@ import Rich from 'rich-js'
 
 **嵌套条件**
 
-exports 还支持多层嵌套，支持在运行环境中嵌套不同的引入方式从而进行有条件的导出。
+在 monorepo 越来越流行的今天，一个 app package 引用另一个在 workspace 中的 library package 的场景是非常常见的。如果直接使用 library package 对外发布时的 exports 规则（例如都指向 dist 文件夹的文件），就不方便通过修改 library src 下的源码来利用热更新。
 
-```json
-{
-  "exports": {
-    "node": {
-      "import": "./feature-node.mjs",
-      "require": "./feature-node.cjs"
-    },
-    "default": "./feature.mjs"
-  }
-}
+
+```txt
+├── apps
+│   └── app1
+│       ├── package.json
+│       ├── src
+│       │   └── main.ts
+│       └── vite.config.ts
+└── packages
+    └── library1
+        ├── dist
+        │   └── index.mjs // 发布时的代码
+        ├── package.json
+        └── src
+            └── index.ts // 希望修改代码热更新能生效
 ```
 
-上述的匹配条件就类似于 js 中的 if 语句，首先检查是否是 Node 环境下去运行。如果是则进入模块判断是 ESM 引入方式还是 CJS 方式。
-
-如果不是，则进行往下匹配进入 default 默认匹配，default 会匹配任何方式。
-
-**更多的 exports key**
-
-当然，除了上述 Node 中支持的 exports key 的条件。比如上述我们提到的 import、require、node、default 等。
-
-同样，exports 的 Key 也支持许多社区中的成熟关键字条件，比如：
-
-- "types" typescipt 可以使用它来解析给定导出的类型定义文件
-- "deno" 表示 Deno 平台的关键 key。
-- "browser" 任何 Web 浏览器环境。
-- "development" 可用于定义仅开发环境入口点，例如提供额外的调试上下文。
-- "production" 可用于定义生产环境入口点。必须始终与 互斥"development"
-
-
-最后，让我们以 Vue/Core 中的 exports 来为大家看看开源项目中的 exports 关键字用法：
-
+为了实现 vite 开发环境下 library package 能热更新，我们一般会这样组织它的 exports：
 ```json
 {
-   "exports": {
+  "type": "module",
+  "exports": {
     ".": {
       "import": {
-        "node": "./index.mjs",
-        "default": "./dist/vue.runtime.esm-bundler.js"
-      },
-      "require": "./index.js",
-      "types": "./dist/vue.d.ts"
-    },
-    "./server-renderer": {
-      "import": "./server-renderer/index.mjs",
-      "require": "./server-renderer/index.js"
-    },
-    "./compiler-sfc": {
-      "import": "./compiler-sfc/index.mjs",
-      "require": "./compiler-sfc/index.js"
-    },
-    "./dist/*": "./dist/*",
-    "./package.json": "./package.json",
-    "./macros": "./macros.d.ts",
-    "./macros-global": "./macros-global.d.ts",
-    "./ref-macros": "./ref-macros.d.ts"
+        // 开发环境使用 src 下的源码，因此我们修改源码也能热更新
+        "development": "./src",
+        // 生产环境下，也就是在 app 运行 vite build 时使用打包编译的 dist
+        "default": "./dist/es/index.mjs"
+      }
+    }
+  },
+  "publishConfig": {
+    // 发布出去时我们不需要保留 development 这个 condition
+    // 如果保留，会导致使用这个库的用户也走 src
+    "exports": {
+      ".": {
+        "import": "./dist/es/index.mjs"
+      }
+    }
   }
 }
 ```
+
+在上面的例子中，首先我们使用了 `development` 条件，这个条件 vite 是默认支持的。然后你会发现我们是在 `import` 条件中使用的 `development` 条件，也就是说 `exports` 是支持内嵌条件的。
+值得注意的是我们使用了 `publishConfig` 配置来在 `npm publish` 时覆盖我们的 `exports` 配置。
+并不是所有的字段都支持在 `publicConfig` 覆盖，例如 npm 不支持覆盖 `typesVersion`，但是我平时使用的 pnpm 是支持的。
+
+**types 条件**
+
+前面我们提到过可以使用 typesVersions 字段处理子路径模块的 typescript 类型，但是 typesVersions 正如它的名字所表达的是用来表示不同的版本下使用不同的类型。聪明的你应该很容易想到要是能统一用 exports 来管理类型就好了，types条件就是用来描述 typescript 类型的解析规则。
+
+看一个实际的例子：
+```json
+{
+  "name": "unplugin-auto-import",
+  "version": "0.15.2",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.js"
+    },
+    "./*": "./*",
+    "./nuxt": {
+      "types": "./dist/nuxt.d.ts",
+      "require": "./dist/nuxt.cjs",
+      "import": "./dist/nuxt.js"
+    },
+    "./astro": {
+      "types": "./dist/astro.d.ts",
+      "require": "./dist/astro.cjs",
+      "import": "./dist/astro.js"
+    },
+    "./rollup": {
+      "types": "./dist/rollup.d.ts",
+      "require": "./dist/rollup.cjs",
+      "import": "./dist/rollup.js"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts",
+      "require": "./dist/types.cjs",
+      "import": "./dist/types.js"
+    },
+    "./vite": {
+      "types": "./dist/vite.d.ts",
+      "require": "./dist/vite.cjs",
+      "import": "./dist/vite.js"
+    },
+    "./webpack": {
+      "types": "./dist/webpack.d.ts",
+      "require": "./dist/webpack.cjs",
+      "import": "./dist/webpack.js"
+    },
+    "./esbuild": {
+      "types": "./dist/esbuild.d.ts",
+      "require": "./dist/esbuild.cjs",
+      "import": "./dist/esbuild.js"
+    }
+  },
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "*": ["./dist/*"]
+    }
+  }
+}
+```
+
+注意点：
+
+- types 条件应该放到其它条件也就是 require 和 import 前面
+- 这里声明 main, module,typesVersions 是为了兼容性，在理想情况下，一个 exports 对象能解决所有问题，它们都可以不写。
+
+**通用类型配置方法**
+
+typescript 在所有模块解析策略下查找类型时都支持`相邻同名文件`的`扩展名匹配`，例如：
+```txt
+├── dist
+│   ├── add.js
+│   └── add.d.ts
+```
+
+也就是说在其它配置不使用的情况下（例如不使用 exports、不设置 typings）：
+- 如果你是使用 node 策略，对于 ./dist/index.js，只要存在相邻的 ./index/index.d.ts 即可。
+- 如果你使用的 `node16` | `nodenext` 策略，对于 `./dist/index.mjs` 需要存在 `./dist/index.d.mts`；对于 `./dist/index.cjs`，需要存在 `./dist/index.cts`。
+
+
+**优先级**
+
+**自定义 condition**
+
+显然，nodejs 不可能内置支持所有条件，例如社区广泛使用的下列条件
+- "types"
+- "deno"
+- "browser"
+- "react-native"
+- "development"
+- "production"
+
+如果你想让 nodejs 能够处理 xxx 条件，你可以在运行 node 指定 conditions 参数：
+```json
+{
+  "name": "xxx",
+  "exports": {
+    ".": {
+      "xxx": "./dist/hello.js",
+      "require": null,
+      "default": null
+    }
+  }
+}
+```
+```sh
+node --conditions=xxx apps/commonjs-app/index.js
+```
+
+注意这里条件 `xxx` 我放到了 `执行文件` 前面了，因为 commonjs 下 require 条件也能匹配，所以为了 xxx 能优先匹配，需要将它放到 `执行文件` 前面。
+
+
+可以看到它同时配置了 typesVersion 和 exports，那 tsc 以哪个为标准呢？
+
+首先这和 `tsconfig` 的 `moduleResolution` 有关，如果是 node，那它根本不认识 exports 字段，所以使用的是 typesVersions。也因为这个原因，unplugin-auto-import 为了兼容用户使用的moduleResolution 是 node 的情况，还是配置了 typesVersions。
+
+在使用 node16 之后新增的模块解析策略时，tsc 会优先取 exports 配置的类型解析规则，忽略 typesVersions。不过如果你不使用 exports 配置 ts 类型，tsc 还是支持typesVersions 的。需要注意的是这个时候 typesVersions 需要写扩展名：
+
+```json
+{
+  "name": "math",
+  "exports": {
+    "./*": {
+      "types": "./src/*.ts"
+    }
+  },
+  // moduleResolution: node16 情况下，没写 exports, typesVersions 还是有用的
+  "typesVersions": {
+    "*": {
+      "*": [
+        // 如果是 moduleResolution: node，不用写扩展名 .ts
+        "./src/*.ts"
+      ]
+    }
+  }
+}
+```
+
 
 ### typesVersions
 
-typesVersions 是对主声明文件路径的映射
+发布 npm 包的类型声明文件目前主要有两种形式：
 
+- 发布 types 包到 [DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped)，目前有 8000+ 包采用这个方式
+- 发布 npm 包携带 `声明文件`
+
+当我们发布一个 npm 包并且想要把类型声明文件一起发布的时候，一般情况下我们使用 typings 字段指向我们入口类型文件即可，例如 moment：
 ```json
 {
-  "exports": {
-    ".": {
-      "import": ""
-    }
-  },
+  "name": "moment",
+  "version": "2.29.4",
+  "main": "./moment.js",
+  "typings": "./moment.d.ts"
 }
 ```
 
+**子路径导出类型声明**
+
+如果你选择使用 types 包发布类型声明，那问题倒简单，你只需要像 [@types/lodash](https://npmview.vercel.app/@types/lodash) 那样将类型声明文件按照导入的路径一样组织目录即可
+```txt
+├── add.d.ts
+├── fp
+│   └── add.d.ts
+└── package.json
+
+```
+
+具体来说你导入语句是
+
+```js
+import add from 'lodash/add';
+```
+
+就需要存在 node_modules/@types/lodash/add.d.ts 这样的文件。如果你是像 node_modules/@types/lodash/types/add.d.ts 这样组织，把声明文件放到 `types` 目录下，tsc 肯定是找不到的。
+
+但如果你是选择类型声明和源码一起捆绑发布，还采用这种方式，把源码和类型声明混在一起，维护起来便会相当难受。
+
+```txt
+├── add.d.ts
+├── add.js
+├── fp
+│   ├── minus.d.ts
+│   ├── minus.js
+└── package.json
+```
+
+可以看到它的 .d.ts 没有平铺到 package.json 同级，那么现在问题就是怎样把类型声明从 unplugin-auto-import/vite 重定向到 unplugin-auto-import/dist/vite.d.ts 了。这就用到了 typesVersions 字段：
+
+我们来看看 [unplugin-auto-import](https://npmview.vercel.app/unplugin-auto-import) 是怎样做的，首先它的目录结构是这样：
+```txt
+├── auto-imports.d.ts
+├── dist
+│   ├── astro.d.ts
+│   ├── esbuild.d.ts
+│   ├── index.d.ts
+│   ├── nuxt.d.ts
+│   ├── rollup.d.ts
+│   ├── types.d.ts
+│   ├── vite.d.ts
+│   ├── webpack.d.ts
+└── package.json
+```
+
+可以看到它的 .d.ts 没有平铺到 package.json 同级，那么现在问题就是怎样把类型声明从 `unplugin-auto-import/vite` 重定向到 `unplugin-auto-import/dist/vite.d.ts` 了。这就用到了 typesVersions 字段：
+
+```json
+{
+  "name": "unplugin-auto-import",
+  "version": "0.15.2",
+  "types": "dist/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "*": ["./dist/*"]
+    }
+  }
+}
+```
+- 外层的 * 表示 `typescript版本范围` 是 `任意版本`
+- 内层的 * 表示 `任意子路径`，例如 unplugin-auto-import/vite 就对应 vite
+
+整体表示在 `任意版本` 的 `typescript` 下，查找 unplugin-auto-import 的类型时，将查找路径重定向到 `dist` 目录。更详细的解释可以看官方文档：[Version selection withtypesVersions](https://www.typescriptlang.org/docs/handbook/declaration-files/publishing.html#version-selection-with-typesversions)。
+
+注意我们这里 ./dist/* 没有写扩展名，如果 tsconfig.json 设置的 moduleResolution 是 `node16` | `nodenext`，那就要改成 `./dist/*.d.ts`
+
+其实 `typesVersions` 设计目的并不是用来处理子路径导出的，这一点从它的名字就可以看出来，它是用来解决同一个包在不同版本的 typescript 下使用不同的类型声明，例如我们看 @types/node：
+```json
+{
+  "name": "@types/node",
+  "version": "18.15.11",
+  "typesVersions": {
+    "<=4.8": {
+      "*": ["ts4.8/*"]
+    }
+  }
+}
+```
+
+也就是说当你使用的 typescript 版本不大于 4.8，tsc 就会使用 @types/node/ts4.8 文件夹内的类型说明，否则就用 @types/node 包根目录的类型声明：
+```txt
+├── fs
+│   └── promises.d.ts
+├── fs.d.ts
+├── package.json
+├── ts4.8
+│   ├── fs
+│   │   └── promises.d.ts
+│   ├── fs.d.ts
+│   └── zlib.d.ts
+└── zlib.d.ts
+```
+
+对于下面的导入语句：
+```ts
+import fs from 'node:fs/promises';
+```
+
+当 ts 版本为 4.7，会找到 @types/node/ts4.8/fs/promises
+
+当 ts 版本为 5.0，会找到 @types/node/fs/promises
 
 ## 开发配置
 
