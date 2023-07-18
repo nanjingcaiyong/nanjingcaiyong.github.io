@@ -2,6 +2,15 @@ import { reactive } from 'vue';
 const store = reactive({
   news: [
     {
+      title: '如何在 ESM 中的 使用__dirname 和 __filename',
+      content: '我们通过在 commonjs 环境下使用 __dirname 和 __filename, 下面我们说一下换到 ESM 环境下同样实现这两个环境变量',
+      img: '',
+      type: '大前端',
+      date: '2023-07-18',
+      link: '/news/cjs-env-var',
+      index: 15,
+    },
+    {
       title: 'package.json 之 exports',
       content: '',
       img: '',

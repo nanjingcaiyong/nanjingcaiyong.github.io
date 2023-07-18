@@ -473,7 +473,7 @@ package.json
 {
     "compilerOptions": {
 
-      /* Language and Environment */
+      /* 基础选项 */
       "target": "ES5",                           // 指定编译后生成的的JS版本: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019' or 'ESNEXT'
       "lib": ["DOM", "ES2016", "ES2017.Object"], // 和 target 一起使用。ts不会在编译的时候注入polyfull，需要手动配置 target 所需的 polyfill
       
@@ -486,8 +486,15 @@ package.json
       
       /* Emit */
       "noEmit": false,                          // 是否输出声明文件。true: 不生成声明文件，false: 生成声明文件
+      "declaration": true ,                     // 是否生成声明文件。设置 declarationDir 属性，declaration 必须为true
+      "emitDeclarationOnly": true,              // 仅仅生成 *.d.js 文件
       "declarationDir": "./dist/types",         // 输出的声明文件目录
       "outDir": "dist",                          // 默认情况下，ts编译后的js文件，与源文件都在同一个目录下。使用outDir选项可以指定编译后的文件所在的目录。清理之前编译生成的js文件。
+      "removeComments": true,                    // 是否删除注释
+
+      /* Interop Constraints */
+      "allowSyntheticDefaultImports": true,
+      "esModuleInterop": true,
 
       /* 类型检查 */
       "strict": true,
