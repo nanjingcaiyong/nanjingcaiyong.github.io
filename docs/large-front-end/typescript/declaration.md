@@ -1272,6 +1272,160 @@ finally {
 
 就像 `for / of` 一样，`downlevelIteration` 将使用 `Symbol.iterator`（如果存在）来更准确地模拟 ES 6 行为。
 
+### sourceRoot
+
+需要启用 `inlineSourceMap` 或选 `sourceMap`，才能生效。
+
+指定`编译后`文件映射回 `TypeScript` `源文件` 的路径，以便调试器定位。当TypeScript文件的位置是在运行时指定时，才会使用此标记。路径信息会被加到 sourceMap里。例如：
+```json
+{
+  "compilerOptions": {
+    "sourceMap": true,
+    "sourceRoot": "https://my-website.com/debug/source/"
+  }
+}
+```
+
+编译后的 `index.js`文件映射回源文件路径 `https://my-website.com/debug/source/index.ts`。
+
+index.js.map 文件
+```json
+{
+  "version":3,
+  "file":"index.js",
+  "sourceRoot":"https://my-website.com/debug/source/",
+  "sources":["index.ts"],
+  "names":[],
+  "mappings":";;AAGA,IAAM,GAAG,GAAG,QAAQ,CAAC;;IACrB,KAAgB,IAAA,QAAA,SAAA,GAAG,CAAA,wBAAA,yCAAE;QAAhB,IAAM,CAAC,gBAAA;QACV,OAAO,CAAC,GAAG,CAAC,CAAC,CAAC,CAAC;KAChB;;;;;;;;;AAED,IAAM,GAAG,kBAAI,CAAC,GAAK,CAAC,CAAC,EAAC,CAAC,EAAC,CAAC,CAAC,QAAC,CAAC"
+}
+```
+
+### mapRoot
+
+指定调试器`定位`映射文件(.map)时的寻址位置，例如：
+```json
+{
+  "compilerOptions": {
+    "sourceMap": true,
+    "mapRoot": "https://my-website.com/debug/sourcemaps/"
+  }
+}
+```
+
+index.js 在映射回 `源文件` 时，会先通过`映射文件` https://my-website.com/debug/sourcemaps/index.js.map，才能找到源文件。这里的 `映射文件` 地址路径来自于选项 `mapRoot` 的配置。
+
+### inlineSourceMap
+
+启用后，源映射内容不会生成在单独的 `.js.map` 文件中，而是作为嵌入字符串包含在 `编译后的文件` 中。虽然这会导致编译后的 `JS` 文件更大，但在某些场景下可能很方便。例如，你可能想要在不允许 `.map` 提供文件的 `Web服务器` 上调试 `js` 文件。
+
+`inlineSourceMap` 与 `sourceMap` 互斥。`sourceMap` 会将 `源映射内容` 生成在单独的 `.js.map` 文件中，而 `inlineSourceMap` 会将 `源映射内容` 嵌入编译后的文件底部。例如：
+
+```ts
+const helloWorld = "hi";
+console.log(helloWorld);
+```
+
+默认情况下转换为以下 JavaScript
+
+```ts
+"use strict";
+const helloWorld = "hi";
+console.log(helloWorld);
+```
+
+启用`inlineSourceMap`, 编译后的文件底部有一条注释，其中包括文件的源映射。
+
+```js
+"use strict";
+const helloWorld = "hi";
+console.log(helloWorld);
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyJpbmRleC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiO0FBQUEsTUFBTSxVQUFVLEdBQUcsSUFBSSxDQUFDO0FBQ3hCLE9BQU8sQ0FBQyxHQUFHLENBQUMsVUFBVSxDQUFDLENBQUMifQ==
+```
+
+### inlineSources
+
+启用后，会将 `.ts` 原始内容作为字符串包含在源映射中。
+
+需要同时启用 `sourceMap` 或 `inlineSourceMap`。
+
+`sourceMap` 和 `inlineSources`组合，`源映射内容` 和 `.ts原始代码` 都会被包含在 `.js.map`中。
+
+`inlineSourceMap` 和 `inlineSources`组合，不会额外生成`.js.map`文件。`源映射内容` 和 `.ts原始代码` 都会被包含在编译后的 `JS` 文件中。
+
+例如：
+```ts
+const helloWorld = "hi";
+console.log(helloWorld);
+```
+
+默认情况下转换为以下 JavaScript：
+
+```js
+"use strict";
+const helloWorld = "hi";
+console.log(helloWorld);
+```
+
+启用 `inlineSources` 和 `inlineSourceMap`，编译后的文件底部有一条注释，其中包括文件的源映射。
+
+注意，结尾的源映射内容与 `只单独启用` `inlineSourceMap` 不同。因为启用 `inlineSources`后，源映射内容包含了 `.ts` 的 `原始代码`
+
+```js
+"use strict";
+const helloWorld = "hi";
+console.log(helloWorld);
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyJpbmRleC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiO0FBQUEsTUFBTSxVQUFVLEdBQUcsSUFBSSxDQUFDO0FBQ3hCLE9BQU8sQ0FBQyxHQUFHLENBQUMsVUFBVSxDQUFDLENBQUMiLCJzb3VyY2VzQ29udGVudCI6WyJjb25zdCBoZWxsb1dvcmxkID0gXCJoaVwiO1xuY29uc29sZS5sb2coaGVsbG9Xb3JsZCk7Il19
+```
+
+### emitBOM
+
+
+### newLine
+
+指定输出文件时使用的行尾结束符: CRLF (dos)或 LF (unix)。
+
+
+### stripInternal
+
+不对具有 /** @internal */ JSDoc注解的代码生成声明。这是一个内部编译器选项，尽量不要修改选项。
+
+例如：
+
+```ts
+/**
+ * Days available in a week
+ * @internal
+ */
+export const daysInAWeek = 7;
+ 
+/** Calculate how much someone earns in a week */
+export function weeklySalary(dayRate: number) {
+  return daysInAWeek * dayRate;
+}
+```
+
+将选项设置为`false`（默认），生成的 `.d.ts`文件
+```ts
+/**
+ * Days available in a week
+ * @internal
+ */
+export declare const daysInAWeek = 7;
+/** Calculate how much someone earns in a week */
+export declare function weeklySalary(dayRate: number): number;
+```
+
+
+启用 `stripInternal`后，生成的`.d.ts`文件
+```ts
+/** Calculate how much someone earns in a week */
+export declare function weeklySalary(dayRate: number): number;
+```
+
+只有生成的声明文件存在差异，编译后的 `JavaScript` 相同
+
+### preserveConstEnums
+
 ## include
 
 ## exclude
