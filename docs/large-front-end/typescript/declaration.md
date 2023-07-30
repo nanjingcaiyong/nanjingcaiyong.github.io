@@ -1426,6 +1426,431 @@ export declare function weeklySalary(dayRate: number): number;
 
 ### preserveConstEnums
 
+在生成的代码中保留 `const enum` 的声明。 `const enum` 提供了通过 `JavaScript` 生成枚举值的方法而不是运行时跟踪，来减少应用程序在运行时的总体内存占用
+
+例如：
+```ts
+const enum Album {
+  JimmyEatWorldFutures = 1,
+  TubRingZooHypothesis = 2,
+  DogFashionDiscoAdultery = 3,
+}
+ 
+const selectedAlbum = Album.JimmyEatWorldFutures;
+if (selectedAlbum === Album.JimmyEatWorldFutures) {
+  console.log("That is a great choice.");
+}
+```
+
+默认 `const enum` 是将 `any` 转换 `Album.Something` 为相应的数字，并从 JavaScript 中完全`删除`对枚举的引用
+
+```js
+"use strict";
+const selectedAlbum = 1 /* Album.JimmyEatWorldFutures */;
+if (selectedAlbum === 1 /* Album.JimmyEatWorldFutures */) {
+    console.log("That is a great choice.");
+}
+```
+当 启用`preserveConstEnums`时
+
+```js
+"use strict";
+var Album;
+(function (Album) {
+    Album[Album["JimmyEatWorldFutures"] = 1] = "JimmyEatWorldFutures";
+    Album[Album["TubRingZooHypothesis"] = 2] = "TubRingZooHypothesis";
+    Album[Album["DogFashionDiscoAdultery"] = 3] = "DogFashionDiscoAdultery";
+})(Album || (Album = {}));
+const selectedAlbum = 1 /* Album.JimmyEatWorldFutures */;
+if (selectedAlbum === 1 /* Album.JimmyEatWorldFutures */) {
+    console.log("That is a great choice.");
+}
+```
+
+本质上 `const enums` 只是`实现`了这样的源代码枚举功能，没有在运行时跟踪
+
+### declarationDir
+
+用于配置`声明文件``根路径`的选项。
+```txt
+example
+├── index.ts
+├── package.json
+└── tsconfig.json
+```
+
+tsconfig.json
+```json
+{
+  "compilerOptions": {
+    "declaration": true,
+    "declarationDir": "./types"
+  }
+}
+```
+
+将`index.ts`编译生成的`.d.ts`声明文件放在 `types` 目录下
+```txt
+example
+├── index.js
+├── index.ts
+├── package.json
+├── tsconfig.json
+└── types
+    └── index.d.ts
+```
+
+
+### preserveValueImports
+
+已弃用。使用 `verbatimModuleSyntax`
+
+在某些情况下，`TypeScript` 无法检测到您正在使用的导入。例如：
+
+```ts
+import { Animal } from "./animal.js";
+eval("console.log(new Animal().isDangerous())");
+```
+
+或正在使用的代码 `编译为 HTML` 语言像 `Svelte` 或 `vue`。`preserveValueImports` 将阻止 `TypeScript` 删除看起来`未使用`的导入。
+
+与 `isolatedModules` 结合使用时，导入的类型必须标记为仅类型，因为一次处理单个文件的编译器无法知道导入是否是未使用的值，或者是必须删除以避免运行时崩溃的类型。
+
+
+## Interop Constraints
+
+### isolatedModules
+
+虽然可以使用 `TypeScript` 从 `TypeScript` 中生成 `JavaScript` 代码，但使用`Babel`等其他转译器也很常见。然而，其他转译器一次只能操作一个文件，这意味着它们无法进行基于完全理解类型系统后的代码转译。
+
+这个限制也同样适用于被一些构建工具使用的 `TypeScript` 的 `ts.transpileModule` 接口。
+
+这些限制可能会导致某些 `TypeScript` 功能（例如`const enums` 和 `namespaces`）出现运行时问题。
+
+启用 `isolatedModules` 选项会告诉 `TypeScript` 在编写的某些代码`无法`被`单文件转译的过程` `正确解释`时`发出警告`。
+
+该选项不会改变代码的行为，也不会改变 TypeScript 检查和代码生成过程的行为。
+
+当启用 `isolatedModules` 时不能正常工作的例子
+
+在 `TypeScript` 中，可以导入类型，然后将其导出
+
+someModule.ts
+```ts
+export function someFunction () {}
+export type someType = {[key: string]: any}
+```
+
+main.ts
+```ts
+import { someType, someFunction } from "someModule";
+ 
+someFunction();
+ 
+export { someType, someFunction };
+```
+
+因为 `someType` 没有值，所以在代码生成的时候 `export` 不会将它导出（将在 `JavaScript` 中运行时报错）
+```js
+export { someFunction };
+```
+
+`单文件转译器`不知道`someType` 是否生成值，因此`仅导出``引用类型的名称`是`错误`的。
+
+**非模块文件**
+
+如果启用 `isolatedModules`，则所有实现文件都必须是`模块`（文件内含有 `import` 或 `export` 才能成为 `模块`）。如果任何文件不是模块，则会发生报错（`TypeScript@5.0.0`后不报错）。 例如：
+
+```ts
+function fn() {}
+```
+
+此限制不适用于.d.ts文件。
+
+**参考 const enum**
+
+在 `TypeScript` 中，当您引用 `const enum` 时，生成的 `JavaScript` 中的实际值被替换。例如：
+
+```ts
+declare const enum Numbers {
+  Zero = 0,
+  One = 1,
+}
+console.log(Numbers.Zero + Numbers.One);
+```
+
+编译后的 JavaScript：
+```js
+"use strict";
+console.log(0 + 1);
+```
+
+如果不知道这些枚举成员的值，其他转译器就无法替换`Numbers`的引用，如果不管的话，运行时报错（因为运行时Numbers没有对象）。因此，启用`isolatedModules` 选项时，`Numbers` 成员将在其使用的文件中报错
+
+
+
+### verbatimModuleSyntax
+
+要求在如果导入的是一个类型，必须用 `type` 操作符声明，否则报错。
+
+```ts
+// car.ts
+export type Car = {name: 'benz'}
+```
+
+```ts
+// main.ts
+import { Car } from './car.ts'; // 启用 verbatimModuleSyntax 选项后将报错
+```
+
+main.ts修改为
+```ts
+import type { Car } from './car.ts'; // 添加 type 操作符后，报错消失
+```
+
+默认情况下，`TypeScript` 会执行称为 `import elision` 的操作。例如下面这种情况：
+```js
+import { Car } from './car'
+export function drive (car: Car) {
+  // ...
+}
+```
+
+当 `TypeScript` 在编译时检测到仅使用类型导入后会将该 `import`语句完全删除。生成的 `JavaScript` 代码如下：
+```js
+export function drive(car) {
+  // ...
+}
+```
+
+大多数时候没问题，因为如果 `Car` 不是从 `./car` 导出的值，那么在运行环境中将报错。
+
+但它确实为某些边缘情况增加了一层复杂性。例如，没有任何状态的 `import` 语句像`import "./car";` 会被完全删除。
+
+这实际上对于有副作用或没有副作用的模块的影响是不一样的。
+
+`TypeScript` 生成 `JavaScript` 的策略还具有另外几层复杂性。import `elision` 并不是总是由导入的方式决定。它通常
+
+
+`TypeScript` `5.0` 引入了一个名为 `--verbatimModuleSyntax` 的新选项去简化流程。规则要简单得多，任何没有`type`修饰符的导入或导出都会保留，而使用 `type` 修饰符的内容都会被`完全删除` - 它通常也会参考值的声明方式。
+
+所以并不总是清楚代码是否像下面这样
+
+```ts
+export { Card } from './car';
+```
+
+是否应该保留还是删除。如果 `Car` 是用类似 `class` 那样被声明，那么它会被保留在生成的`JavaScript`文件中。但是如果用 `type` 或 `interface` 声明 `Car`，那么 `JavaScript` 文件就不会导出 `Car`。
+
+`导入` 和 `导出` 的 `type` 修饰符能够针对上面的情况有所帮助。我们可以明确指出 `导入` 或 `导出` 是否仅用于类型分析，并且可以使用 `type` 修饰符指定在生成 `JavaScript` 文件的时候完全删除该条 `导入` 或 `导出` 语句。
+
+```ts
+// Erased away entirely.
+import type { A } from "a";
+// Rewritten to 'import { b } from "bcd";'
+import { b, type c, type d } from "bcd";
+// Rewritten to 'import {} from "xyz";'
+import { type xyz } from "xyz";
+```
+
+`type` 修饰符自身没什么作用 - 默认情况下 `module elision` 仍会删除导入，并且不会强制你去区分 `type` 和 `普通` 导入 和 导出。所以 `TypeScript` 使用 `--importsNotUsedAsValues` 标志来确保你使用 `type` 修饰符，`--preserveValueImports` 标志来防止 `module elision` 对导入语句的删除，并且 `--isolatedModules` 来确保你的 `TypeScript` 代码可以在`不同` `编译器`间运行。理解这 `3个` 标志的细节很困难，而且仍然存在一些意外的边缘情况。
+
+
+ `TypeScript` `5.0` 引入了 `--verbatimModuleSyntax` 标志来简化这种情况。这些规则非常简单 - 任何没有 `type`标识符 的 `导入` 或 `导出` 都会被保留，而任何使用 `type` 标识符的 `导入` 或 `导出` 会被删除。
+
+
+ ```ts
+ // Erased away entirely.
+import type { A } from "a";
+// Rewritten to 'import { b } from "bcd";'
+import { b, type c, type d } from "bcd";
+// Rewritten to 'import {} from "xyz";'
+import { type xyz } from "xyz";
+```
+
+启用该选项，当你设置或文件扩展名暗示不同系统时，ECMAScript `import` 和 `export` 不会被重写为 `require` 调用。相反，你会收到报错。如果你需要生成的代码使用 `require` 和 `module.exports`，你将不得不使用 ES2015之前的 `TypeScript` 模块语法
+
+typescript 代码
+```ts
+import foo = require('foo')
+
+// foo.ts
+function foo () {}
+function bar () {}
+function baz () {}
+
+export = {
+  foo,
+  bar,
+  baz
+}
+```
+
+生成的 JavaScript 代码
+
+```js
+const foo = require('foo');
+
+// foo.js
+function foo () {}
+function bar () {}
+function baz () {}
+
+module.exports = {
+  foo,
+  bar,
+  baz
+}
+```
+
+上述 `import xxx = require('xxx')` 的语法只能在 `module`选项设为 `commonjs`时生效，否则会报错。
+
+虽然这是一种限制，但是确实有助于使 `import elision` 的问题在静态编译静态暴露出来。例如，在`module`设为 `node16`情况下，忘记设置 `package.json` 的 `type`字段非常常见。因此，开发人员会在没有意识到的情况下开始编写 `CommonJS模块` 而不是 `ES模块`，从而得到意外的查找规则和 `JavaScript`输出。这个新标志可确保你完全清楚你所使用的文件类型。
+
+
+因为 `-verbatimModuleSyntax` 选项提供了 `importsNotUsedAsValues` 和 `preserveValueImports` 几乎一致的功能，所以这两个选项被废弃。
+
+
+### allowSyntheticDefaultImports
+
+启用该选项，`allowSyntheticDefaultImports` 允许这样导入例如：
+```ts
+import React from 'react';
+```
+取代:
+```ts
+import * as React from 'react';
+```
+
+当模块`没有`显式指定默认导出时。
+
+例如：没有启用 `allowSyntheticDefaultImports` 选项
+
+utilFunctions.js
+```js 
+// @filename: utilFunctions.js
+const getStringLength = (str) => str.length;
+ 
+module.exports = {
+  getStringLength,
+};
+ 
+// @filename: index.ts
+import utils from "./utilFunctions"; // 模块“"/xxx/utilFunctions"”没有默认导出。ts(1192)
+ 
+const count = utils.getStringLength("Check JS");
+```
+
+此代码会引发报错，因为没有`import`的模块没有导出`default`。尽管感觉应该如此。为了方便起见，如果没有创建，像 Babel 这样的转译器会自动创建一个默认值。让模块看起来像：
+
+```js
+// @filename: utilFunctions.js
+const getStringLength = (str) => str.length;
+const allFunctions = {
+  getStringLength,
+};
+module.exports = allFunctions;
+module.exports.default = allFunctions;
+```
+
+该选项不会影响编译，它仅用于类型检查。此选项使 `TypeScript` 的行为与 `Babel` 保持一致，生成的代码确保有模块的默认导出（default）。
+
+
+### esModuleInterop
+
+默认情况下（如果将 `esModuleInterop` 设为 `false` 或 未设置） `TypeScript` 像 ES6 模块一样对待 `CommonJS/AMD/UMD`。这样的行为有两个被证实的缺陷：
+
+- 例如 `import * as moment from 'moment'` 这样的命名空间导入等价于 `const moment = require('moment')`
+- 例如 `import moment from 'moment'` 这样的默认导入等价于 `const moment = require('moment').default`
+
+这种错误的行为导致了这两个问题：
+- ES6 模块规范规定，命名空间导入（import * as x）只能是一个对象。TypeScript 把它处理成 = require("x") 的行为允许把导入当作一个可调用的函数，这样不符合规范。
+- 虽然 TypeScript 准确实现了 ES6 模块规范，但是大多数使用 CommonJS/AMD/UMD 模块的库并没有像 TypeScript 那样严格遵守。
+
+开启 `esModuleInterop` 选项将会修复 `TypeScript` 转译中的这两个问题。第一个改变了编译器中的行为，第二个由`polyfill`的两个新的辅助函数修复，确保生成的 `JavaScript` 的兼容性：
+
+```ts
+import * as fs from "fs";
+import _ from "lodash";
+fs.readFileSync("file.txt", "utf8");
+_.chunk(["a", "b", "c", "d"], 2);
+```
+
+禁用 `esModuleInterop`
+```js
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const fs = require("fs");
+const lodash_1 = require("lodash");
+fs.readFileSync("file.txt", "utf8");
+lodash_1.default.chunk(["a", "b", "c", "d"], 2);
+```
+
+启用 `esModuleInterop`
+```js
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const fs = __importStar(require("fs"));
+const lodash_1 = __importDefault(require("lodash"));
+fs.readFileSync("file.txt", "utf8");
+lodash_1.default.chunk(["a", "b", "c", "d"], 2);
+```
+
+注意：命名空间导入`import * as fs from 'fs'`仅考虑导入对象所拥有的属性（基本上是在对象上设置的属性，而不是通过原型链设置的属性）。如果您要导入的模块使用继承属性定义其 API，则需要使用默认导入形式 ( `import fs from 'fs'`) 或禁用esModuleInterop。
+
+注意：您可以通过启用`importHelpers`, 使 JS 生成更简洁的代码：
+```js
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const tslib_1 = require("tslib");
+const fs = tslib_1.__importStar(require("fs"));
+const lodash_1 = tslib_1.__importDefault(require("lodash"));
+fs.readFileSync("file.txt", "utf8");
+lodash_1.default.chunk(["a", "b", "c", "d"], 2);
+```
+
+启用 `esModuleInterop` 也将启用 `allowSyntheticDefaultImports`
+
+### preserveSymlinks
+
+`TypeScript 2.5` 带来了 `preserveSymlinks` 选项，它对应了 `Node.js` 中 `--preserve-symlinks` 选项的行为。这一选项也会带来和`Webpack`的 `resolve.symlinks` 选项相反的行为（也就是说，将`TypeScript`的` preserveSymlinks`选项设置为 `true` 对应了将 `Webpack` 的 `resolve.symlinks` 选项设为 `false`，反之亦然）。
+
+在这一模式中，对于模块和包的引用（比如 import语句和 /// <reference type=".." />指令）都会以相对符号链接文件的位置被解析，而不是相对于符号链接解析到的路径。更具体的例子，可以参考 [Node.js网站的文档](https://nodejs.org/api/cli.html#cli_preserve_symlinks)。
+
+### forceConsistentCasingInFileNames（默认 true）
+
+`TypeScript` 遵循其运行的文件系统的区分大小写规则。如果一些开发人员在区分大小写的文件系统中工作而其他开发人员则不然，这可能会出现问题。`fileManager.ts` 如果尝试通过指定文件导入 `./FileManager.ts`，则该文件将在不区分大小写的文件系统中找到，但不会在区分大小写的文件系统上找到。
+
+启用该选项后，如果程序尝试使用一个在磁盘上大小写不同的文件，`TypeScript` 将发出错误。
+
+## Type Checking
+
 ## include
 
 ## exclude
