@@ -398,7 +398,7 @@ package.json
 
 **shared/tsconfig.json**
 
-```txt
+```json
 {
   "compilerOptions": {
     ...,
@@ -408,10 +408,10 @@ package.json
 ```
 
 **tsconfig.json**
-```txt
+```json
 {
   "compilerOptions": { ... },
-    "references": [
+  "references": [
     { "path": "./shared" }
   ],
   "include": [
@@ -441,7 +441,19 @@ error TS6305: Output file '/xxx/shared/index.d.ts' has not been built from sourc
 
 ### target
 
-指定`编译后`生成的的`JS版本`: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019' or 'ESNEXT'
+现代浏览器支持全部 `ES6` 的功能，所以 `ES6` 是一个不错的选择。如果你的代码部署在旧的环境中，你可以选择设置一个更低的目标值。
+
+改变 `target` 也会改变 `lib` 选项的默认值。 你可以根据需要混搭 `target` 和 `lib` 的配置，你也可以为了方便只设置 target。
+
+如果你只使用 Node.js，这里推荐基于 Node 版本的 target：
+
+| 名称    | 支持的编译目标|
+|--------|-------|
+| Node 8  | ES2017 |
+| Node 10 | ES2018 |
+| Node 12 | ES2019 |
+
+特殊的 ESNext 值代表你的 TypeScript 所支持的最高版本。这个配置应当被谨慎使用，因为它在不同的 TypeScript 版本之间的含义不同，并且会导致升级更难预测。
 
 ### lib
 
@@ -503,14 +515,14 @@ const KEY = Symbol('Hello world')
 }
 ```
 
-你可能出于某些原因改变这些：
+你可能出于某些原因改变它：
 - 你的程序不运行在浏览器中，因此你不想要 "dom" 类型定义。
 - 你的运行时平台提供了某些 JavaScript API 对象（也许通过 polyfill），但还不支持某个 ECMAScript 版本的完整语法。
 - 你有一些 （但不是全部）对于更高级别的 ECMAScript 版本的 polyfill 或本地实现。
 
 ### jsx
 
-控制 JSX 在 JavaScript 文件中的输出方式。 这只影响 .tsx 文件的 JS 文件输出。
+控制 `JSX` 在 `JavaScript` 文件中的输出方式。 这只影响 `.tsx` 文件的 `JS` 文件输出。
 
 ```tsx
 export const render = () => <div>hello world</div>
