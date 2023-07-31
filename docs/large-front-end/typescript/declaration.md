@@ -364,7 +364,7 @@ package.json
 
 ### tsBuildInfoFile
 
-指定路径来存放增量编译信息（tsconfig.tsbuildinfo）
+为.tsbuildinfo增量编译文件指定文件夹。主要用于优化二次编译速度，只编译修改过的文件, 下次编译的时候会进行对比只编译修改过的文件 
 
 ### composite
 
@@ -1011,6 +1011,7 @@ import { resolve } from 'path'; // 找不到模块“path”或其相应的类�
 ## Emit
 
 ### declaration (默认 false)
+
 为项目中每个 `Typescript` 或 `JavaScript` 文件生成`.d.ts`文
 
 这些`.d.ts`文件是类型定义文件，描述模块的外部 API。
@@ -1471,7 +1472,9 @@ if (selectedAlbum === 1 /* Album.JimmyEatWorldFutures */) {
 
 ### declarationDir
 
-用于配置`声明文件``根路径`的选项。
+必须先启用 `declaration` 选项。
+
+用于配置`声明文件` `根路径`的选项。
 ```txt
 example
 ├── index.ts
@@ -1851,6 +1854,465 @@ lodash_1.default.chunk(["a", "b", "c", "d"], 2);
 
 ## Type Checking
 
+### strict
+
+支持更严格的类型检查
+
+### noImplicitAny
+
+不能隐式声明 `any` 类型。
+
+在没有类型注释的情况下，typescript 在无法推断类型时，会将类型回退到 any。这可能会导致一些错误被遗漏。这可能会导致一些错误被遗漏。
+
+启用此配置， `TypeScript` 会在类型回退到 `any` 时提示错误。
+```ts
+function fn (s) {
+  // Parameter 's' implicitly has an 'any' type.
+  console.log(s.substr(3));
+}
+```
+
+### strictNullChecks
+
+启用后，`TypeScript` 会把 `undefined` 和 `null` 作为不同的类型。
+
+例如下面的 `TypeScript` 代码，`users.find` 不能保证找到 `user` 对象，尽管这样你仍然可以像下面这样写代码：
+
+```ts
+declare const loggedInUsername: string;
+ 
+const users = [
+  { name: "Oby", age: 12 },
+  { name: "Heera", age: 32 },
+];
+ 
+const loggedInUser = users.find((u) => u.name === loggedInUsername);
+console.log(loggedInUser.age);
+```
+
+启用该选项后，将引发报错。表示在使用 `loggedInUser` 前不能保证它有值。
+
+### strictFunctionTypes
+
+当开启时，TypeScript 会对 函数的参数类型使用更严格的检查。
+
+```ts
+function fn(x: string) {
+  return x
+}
+type Fn = (ns: string | number) => string | number
+
+const fn1: Fn = fn // error: Types of parameters 'x' and 'ns' are incompatible.
+
+```
+
+需要注意的是，该配置只适用于 `function` 语法，而不适用于 `method` 语法。如下：
+
+```ts
+type Methodish = {
+  func(x: string | number): void;
+};
+ 
+function fn(x: string) {
+  console.log("Hello, " + x.toLowerCase());
+}
+ 
+// Ultimately an unsafe assignment, but not detected
+const m: Methodish = {
+  func: fn,
+};
+m.func(10);
+```
+
+### strictBindCallApply
+
+当开启时，TypeScript 会检查 call、bind和apply是否使用正确的参数调用底层函数。
+
+```ts
+// With strictBindCallApply on
+function fn(x: string) {
+  return parseInt(x);
+}
+ 
+const n1 = fn.call(undefined, "10");
+ 
+const n2 = fn.call(undefined, false); // Argument of type 'boolean' is not assignable to parameter of type 'string'.
+```
+
+当禁用时，函数接受 `任何参数` 并返回 `any`
+```ts
+// With strictBindCallApply off
+function fn(x: string) {
+  return parseInt(x);
+}
+ 
+// Note: No error; return type is 'any'
+const n = fn.call(undefined, false);
+```
+
+### strictPropertyInitialization
+
+当启用时，typescript 会检查 在 class 中已声明的属性，是否有在 constructor 中进行初始化。
+
+```ts
+class UserAccount {
+  name: string;
+  accountType = "user";
+ 
+  email: string; // Property 'email' has no initializer and is not definitely assigned in the constructor.
+
+  address: string | undefined;
+ 
+  constructor(name: string) {
+    this.name = name;
+    // Note that this.email is not set
+  }
+}
+```
+
+在上面的例子中：
+
+- `this.name` 在构建函数中被赋值
+- `this.accountType` 被设置默认值
+- `this.email` 没有被设置会引发错误
+- `this.address` 声明的类型包含潜在的 `undefined`，所以不一定要赋值
+
+### noImplicitThis
+
+如果启用 `strict`，`noImplicitThis` 默认为 `true`。否则为 `false`。
+
+在具有隐含 `any` 类型的 `this` 表达式上引发错误。
+
+例如，下面的 `class` 返回一个函数，函数内尝试返回 `this.width` 和 `this.height` - 但是 `getAreaFunction` 里面 `return`的函数里面的`this`上下文 并不是 `Rectangle` 的实例
+
+```ts
+class Rectangle {
+  width: number;
+  height: number;
+ 
+  constructor(width: number, height: number) {
+    this.width = width;
+    this.height = height;
+  }
+ 
+  getAreaFunction() {
+    return function () {
+      return this.width * this.height;
+// 'this' implicitly has type 'any' because it does not have a type annotation.
+// 'this' implicitly has type 'any' because it does not have a type annotation.
+    };
+  }
+}
+```
+
+### useUnknownInCatchVariables
+
+如果启用 `strict`，该选项默认为 `true`。否则为 `false`
+
+在 `TypeScript 4.0` 中，添加了允许将 `catch` 子句中的变量类型从 `any` 更改为 `unknow`。
+
+`useUnknownInCatchVariables` 值为 `false`时，允许这样的代码：
+
+```ts
+try {
+  // ...
+} catch (err) {
+  console.log(err.message);
+}
+```
+
+但是我们无法保证`catch` 抛出的 `err` 对象是 `Error` 的子类，有可能引发异常。所以我们需要在使用 `err` 对象前进行验证，代码修改为：
+
+```ts
+try {
+  // ...
+} catch (err) {
+  if (err instanceof Error) {
+    console.log(err.message);
+  }
+}
+```
+
+因为您无法提前保证抛出的对象是`Error` 子类，`useUnknownInCatchVariables` 选项确保在静态编译阶段提供错误提示。启用该标志`useUnknownInCatchVariables`后，您不需要额外的语法 (`err:unknown`) 或 `instanceof` 也不需要 `linter` 规则来尝试强制执行此行为。
+
+
+### alwaysStrict
+
+确保文件在 `ECMAScript` 严格模式下解析，并对每个源文件添加 `"use strict"`。
+
+`ECMAScript strict` 模式是在 `ES5` 中引入的，它为 `JavaScript` 引擎的运行时行为进行调整从而提高性能，并且`严格模式`会引发一系列错误提示。
+
+### noUnusedLocals
+
+启用后，检查未使用的局部变量(只提示不报错)
+
+```ts
+const createKeyboard = (modelID: number) => {
+  const defaultModelID = 23; //'defaultModelID' is declared but its value is never read.
+  return { type: "keyboard", modelID };
+};
+```
+
+### noUnusedParameters
+
+启用后，检查未使用的函数参数(只提示不报错)
+
+```ts
+const createDefaultKeyboard = (modelID: number) => {
+// 'modelID' is declared but its value is never read.
+  const defaultModelID = 23;
+  return { type: "keyboard", modelID: defaultModelID };
+};
+```
+
+### exactOptionalPropertyTypes
+
+使用该选项，必须先启用 `strictNullChecks`。
+
+启用后，`typescript` 将会用更加严格的模式，对通过 `type` 或者 `interface` 声明的包含 `?` 的可选属性的检查。
+
+```ts
+interface Theme {
+  colorThemeOverride?: 'dark' | 'light';
+}
+```
+
+如果没有启用这个配置，那么 colorThemeOverride 的值可以是 `'dark' | 'light' | undefined`。如果启用这个配置，则值不能被显示的赋值 `undefined`。
+
+
+### noImplicitReturns
+
+启用后，`TypeScript` 将检查函数中的所有代码路径以确保他们返回值（只提示不报错）
+
+```ts
+function lookupHeadphonesManufacturer(color: "blue" | "black") { // 并非所有代码路径都返回值。ts(7030)
+  if (color === "blue") {
+    return "beats";
+  } else {
+    "bose";
+  }
+}
+```
+
+### noFallthroughCasesInSwitch
+
+
+确保 `switch` 语句内的任何非空 `case` 都包含 `break`、`return` 或 `throw`。(只提示不报错)
+
+```ts
+const a: number = 6;
+ 
+switch (a) {
+  case 0: // switch 语句中的 Fallthrough 情况。ts(7029)
+    console.log("even");
+  case 1:
+    console.log("odd");
+    break;
+}
+```
+
+### noUncheckedIndexedAccess
+
+TypeScript 有一种方法可以通过索引签名来描述具有未知键但已知值的对象。
+
+```ts
+interface EnvironmentVars {
+  NAME: string;
+  OS: string;
+ 
+  // Unknown properties are covered by this index signature.
+  [propName: string]: string;
+}
+ 
+declare const env: EnvironmentVars;
+ 
+// Declared as existing
+const sysName = env.NAME;
+const os = env.OS;
+      
+const os: string
+ 
+// Not declared, but because of the index
+// signature, then it is considered a string
+const nodeEnv = env.NODE_ENV;  // const nodeEnv: string
+
+console.log(nodeEnv.includes('prd'))
+```
+
+`TypeScript` 认为 `nodeEnv` 类型是 `string`，但运行时发现类型是 `undefined`，这可能是不安全的。
+
+那么启用 `noUncheckedIndexedAccess` 选项后，会将添加 `undefined` 到类型中任何未声明的字段中。
+
+```ts
+declare const env: EnvironmentVars;
+ 
+// Declared as existing
+const sysName = env.NAME;
+const os = env.OS;
+      
+const os: string
+ 
+// Not declared, but because of the index
+// signature, then it is considered a string
+const nodeEnv = env.NODE_ENV; // const nodeEnv = string | undefined
+
+console.log(nodeEnv.includes('prd')) // "nodeEnv"可能为"未定义"。ts(18048)
+```
+
+
+### noImplicitOverride 是否禁止子类隐式覆盖父类的成员
+
+要求子类覆盖父类成员时，显示标记 `override`。以免父类修改了成员名称，而子类忘记修改，开启此规则后，子类隐式覆盖父类成员时会收到报错。例如，假设正在对音乐专辑进行建模：
+```ts
+class Album {
+  download () {
+    // Default behavior
+  }
+}
+
+class SharedAlbum extends Album {
+  download() {
+    // Override to get info from many sources
+  }
+}
+```
+
+然后，当你对机器学习生成的播放列表的支持时，你重构了 `Album` 类使用 `setup` 替代了 `download`
+
+```ts
+class Album {
+  setup() {
+    // Default behavior
+  }
+}
+ 
+class MLAlbum extends Album {
+  setup() {
+    // Override to get info from algorithm
+  }
+}
+ 
+class SharedAlbum extends Album {
+  download() {
+    // Override to get info from many sources
+  }
+}
+```
+
+这种情况下，`TypeScript` 没有对类 `SharedAlbum` 重写父类 `download` 函数的警告。
+
+启用 `noImplicitOverride` 后，通过关键字 `override` 可以确保 `子类` 重写的函数和 `父类` 保持同步。
+
+下面是启用 `noImplicitOverride`选项的示例，可以看到缺少 `override` 时收到错误：
+
+```ts
+class Album {
+  setup() {}
+}
+ 
+class MLAlbum extends Album {
+  override setup() {}
+}
+ 
+class SharedAlbum extends Album {
+  setup() {}
+  // This member must have an 'override' modifier because it overrides a member in the base class 'Album'.
+}
+```
+
+
+
+
+### noPropertyAccessFromIndexSignature 是否禁止从索引签名中用点操作符访问未知属性
+
+对于`索引签名`中`未知属性`的访问，用点操作符（`obj.key`）访问可能会是无意识的一个错误，应该使用索引的方式（`obj[key]`）来告诉编译器，这是你确定要访问此未知属性。
+
+如果没有启用该选项，`TypeScript` 将允许你使用 `点操作符` 来访问未定义的字段：
+
+```ts
+interface GameSettings {
+  speed: "fast" | "medium" | "slow";
+  quality: "high" | "low";
+  // 允许任何未知字段类型值为 string 类型
+  [key: string]: string;
+}
+ 
+const settings: GameSettings = {speed: "fast", quality: "high", username: 'sa'}
+settings.speed;   // (property) GameSettings.speed: "fast" | "medium" | "slow"
+settings.quality; // (property) GameSettings.quality: "high" | "low"
+ 
+settings.username; // 允许在 settings 对象上访问未知的 key，并且类型为 string
+```
+
+启用该标志将引发错误，因为对`未知字段`使用了`点`操作符而不是`索引`的方式。
+
+```ts
+const settings: GameSettings = {speed: "fast", quality: "high", username: 'sa'}
+settings.speed;
+settings.quality;
+ 
+settings.username; // 属性“username”来自索引签名，因此必须使用[“username”]访问它。ts(4111)
+```
+
+此标志的目的是在调用语法中表明您对`该属性存在`的`确定程度`;
+
+### allowUnusedLabels 是否允许未标签存在
+
+- undefined 向编辑器提供建议作为警告
+- true 允许
+- false 不允许，并给出错误警告
+
+```ts
+function verifyAge(age: number) {
+  // Forgot 'return' statement
+  if (age > 18) {
+    verified: true; // Unused label.
+  }
+}
+```
+
+```ts
+function verifyAge(age: number) {
+  // Forgot 'return' statement
+  if (age > 18) {
+    verified: true; // Unused label.
+  }
+}
+```
+
+### allowUnreachableCode 是否允许出现死区代码（永远无法执行到达的代码）
+
+- undefined 向编辑器提供建议作为警告
+- true 允许
+- false 不允许，并给出错误警告
+
+```ts
+function fn(n: number) {
+  if (n > 5) {
+    return true;
+  } else {
+    return false;
+  }
+  return true; // error: Unreachable code detected.
+}
+```
+
+## Completeness
+
+### skipDefaultLibCheck
+使用 `skipLibCheck` 替换该选项。跳过默认库声明文件的类型检查
+
+### skipLibCheck
+
+跳过声明文件的类型检查。
+
+这可以节省编译时间，但会牺牲类型系统的准确性。例如，两个库可以以不一致的方式定义同一类型的两个副本。TypeScript不会对所有d.ts文件进行全面检查，而是会对你在应用源代码中特别引用的代码进行类型检查
+
+最常见的一个例子，当 `node_modules` 中存在一个`库的类型`的`两个版本`，就该考虑使用 `skipLibCheck` 选项。
+
+另外一种情况， 当你在 `TypeScript` 版本之间迁移时，你并不想处理这些导致node_modules和JS标准库出现问题的变更
+
+
 ## include
 
 ## exclude
@@ -1858,54 +2320,8 @@ lodash_1.default.chunk(["a", "b", "c", "d"], 2);
 ## files
 
 
-
-
-
 ```json
 {
-    "compilerOptions": {
-
-      /* Projects */
-      "incremental": true,                      // 保存 .tsbuildinfo 文件以允许项目的增量编译
-      "tsBuildInfoFile": "./",                  // 为.tsbuildinfo增量编译文件指定文件夹。主要用于优化二次编译速度，只编译修改过的文件, 下次编译的时候会进行对比只编译修改过的文件 
-
-      /* Language and Environment */
-      "target": "ES5",                           // 指定编译后生成的的JS版本: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019' or 'ESNEXT'
-      "lib": ["DOM", "ES2016", "ES2017.Object"], // 和 target 一起使用。ts不会在编译的时候注入polyfull，需要手动配置 target 所需的 polyfill
-      "jsx": "",                                 // 这些模式只在代码生成阶段起作用 - 类型检查并不受影响
-      "experimentalDecorators": true,          // 是否启用装饰器
-
-      /* Modules */
-      "module": "ES6",                           // "None", "CommonJS", "AMD", "System", "UMD", "ES6", "ES2015", "ESNext"
-      "rootDir": "",
-      "baseUrl": ".",                            // 全局相对模块引入的基础路径
-      "paths": [],                               // 指定模块路径别名
-      "moduleResolution": "node10",              // 模块解析策略。"Bundler", "Classic", "classic", "Node", "Node16", "NodeNext"
-      "types": [],                               // 指定要包含但不在源文件中引用的类型包名称。默认情况下，所有node_modules/@types里的包都会在编译中
-      "typeRoots": [],
-
-
-      /* JavaScript Support */
-      "allowJs": true,                            // 允许js参与到编译中
-      "checkJs": true, 
-
-      /* Emit */
-      "noEmit": false,                          // 是否输出声明文件。true: 不生成声明文件，false: 生成声明文件
-      "declaration": true ,                     // 是否生成声明文件。设置 declarationDir 属性，declaration 必须为true
-      "emitDeclarationOnly": true,              // 仅仅生成 *.d.js 文件
-      "declarationDir": "./dist/types",         // 输出的声明文件目录
-      "outDir": "dist",                          // 默认情况下，ts编译后的js文件，与源文件都在同一个目录下。使用outDir选项可以指定编译后的文件所在的目录。清理之前编译生成的js文件。
-      "removeComments": true,                    // 是否删除注释
-      "declarationMap": true,
-
-      /* Interop Constraints */
-      "allowSyntheticDefaultImports": true,
-      "esModuleInterop": true,
-
-      /* 类型检查 */
-      "strict": true,
-      "noImplicitAny": true,                   // 是否必须显式声明 `any`。true: 是(默认), false: 否
-    },
     "files": [],                              // 指定需要被编译的文件列表。这里不能指定目录，只能是文件，可以省略.ts 后缀。适合需要编译的文件比较少的情况。默认值为 false；
     "include": [],                            // 指定需要编译的文件列表或匹配模式(glob)。include 可以通过通配符指定目录，如"src/**/*" 表示 src 下的所有文件。如果没有指定 files 配置，默认值为 ** ，即项目下所有文件；如果配置了 files，默认值为 [] 空数组；
     "exclude": [],                            // 在 include 圈定的范围内，排除掉一些文件。我们经常用它来排除编译输出目录、测试文件目录、一些生成文件的脚本等文件。默认值为 "node_modules,bower_componen"；
