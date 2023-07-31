@@ -358,27 +358,83 @@ package.json
 
 ### incremental
 
+如果启用 `composite` 选项，则默认为 `true`；否则默认为 `false`
+
 是否开启增量编译。
 
-使 TypeScript 将上次编译的工程图信息保存到磁盘上的文件中。这将会在您编译输出的同一文件夹中创建一系列 .tsbuildinfo 文件
+使 `TypeScript` 将上次编译信息保存到磁盘上的文件中。`.tsbuildinfo` 文件会生成在指定的 `编译输出目录` 中。
+
+主要用于优化二次编译速度，只编译修改过的文件, 下次编译的时候会进行对比只编译修改过的文件。
 
 ### tsBuildInfoFile
 
-为.tsbuildinfo增量编译文件指定文件夹。主要用于优化二次编译速度，只编译修改过的文件, 下次编译的时候会进行对比只编译修改过的文件 
+必须启用 `incremental` 或 `composite`。
+
+为 `.tsbuildinfo` 增量编译文件指定全路径（例如："tsBuildInfoFile": "./dist/.tsbuildinfo" ）。
 
 ### composite
 
-被引用的工程必须启用`composite`设置。使得构建工具（`tsc` 在 `--build` 模式下）可以快速确定引用工程的输出文件位置。 若启用composite标记则会发生如下变动：
-- 如果未指定`rootDir`，默认为包含`tsconfig.json`文件的目录
-- 所有的实现文件必须匹配`include`模式或在`files`数组里列出。如果违反了这个限制，tsc会提示你哪些文件未指定。
-- declaration选项默认为`true`
+`TypeScript 3.0` 引入了 `项目引用（references）` 这一重大特性，让一个 TypeScript 项目可以依赖于其他 TypeScript 项目——特别是可以让 `tsconfig.json` 文件引用其他的 `tsconfig.json` 文件。这样可以更容易地将代码拆分为更小的项目，也意味着可以逐步加快项目的构建速度，并支持跨项目浏览、编辑和重构。
+
+`composite` 选项会强制执行某些约束。使得构建工具（包括 在 `--build` 模式下的 TypeScript 本身）可以快速确定一个工程是否已经建立。确保 TypeScript 可以确定在哪里可以找到引用项目的输出以编译项目
+
+当启用`composite` 选项时：
+
+- 如果未指定 `rootDir` ，默认为包含 `tsconfig.json` 文件的目录
+- 所有实现的文件必须匹配由 `include` 来匹配，或在 `files` 数组中指出。如果违反了这一约束，`tsc` 会提示你哪些文件没有被指定。
+- `declaration` 将默认为 `true`
+
+`client` 和 `server` 共享 `shared`，这样可以避免触发`双重构建`以及意外地引入 shared 的所有内容。
+```txt
+├── client
+│   ├── main.ts
+├── server
+│   ├── main.ts
+├── shared
+│   ├── main.ts
+│   └── tsconfig.json
+└── tsconfig.json
+```
+
+**shared/tsconfig.json**
+
+```txt
+{
+  "compilerOptions": {
+    ...,
+    "composite": true
+  }
+}
+```
+
+**tsconfig.json**
+```txt
+{
+  "compilerOptions": { ... },
+    "references": [
+    { "path": "./shared" }
+  ],
+  "include": [
+    "shared/**/*",
+    "server/**/*",
+    "client/**/*"
+  ]
+}
+```
+
+根目录下的 `tsconfig.json` 必须指定 `include` 或 `files`，否则在编译阶段（`tsc`）报错。
+```txt
+error TS6305: Output file '/xxx/shared/index.d.ts' has not been built from source file '/xxx/shared/index.ts'.
+  The file is in the program because:
+    Matched by default include pattern '**/*'
+```
+
 
 ### disableSourceOfProjectReferenceRedirect
 
 ### disableSolutionSearching
 
 ### disableReferencedProjectLoad
-
 
 
 ## Language and Environment
