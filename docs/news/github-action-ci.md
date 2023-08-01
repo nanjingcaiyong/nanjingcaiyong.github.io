@@ -9,7 +9,7 @@ touch ci.yml
 ## 字段
 
 ### name 
-```yml
+```txt
 on: Github Action Demo
 ```
 
@@ -18,7 +18,7 @@ name字段是 workflow 的名称。如果省略该字段，默认为当前 workf
 ### on 
 
 on字段指定触发 workflow 的条件，通常是某些事件。
-```yml
+```txt
 on: push
 ```
 
@@ -26,7 +26,7 @@ on: push
 
 on字段也可以是事件的数组。
 
-```yml
+```txt
 on: [push, pull_request]
 ```
 

@@ -1117,7 +1117,7 @@ import { resolve } from 'path'; // 找不到模块“path”或其相应的类�
 
 可以用于逐步将 TypeScript 文件逐步添加到 JS 工程中。
 
-它还可以一起使用[declaration]('https://www.typescriptlang.org/tsconfig#declaration')并为 JS 文件[emitDeclarationOnly](https://www.typescriptlang.org/tsconfig#emitDeclarationOnly)创建[声明]('https://www.typescriptlang.org/docs/handbook/declaration-files/dts-from-js.html')。
+它还可以一起使用[declaration](https://www.typescriptlang.org/tsconfig#declaration)并为 JS 文件[emitDeclarationOnly](https://www.typescriptlang.org/tsconfig#emitDeclarationOnly)创建[声明](https://www.typescriptlang.org/docs/handbook/declaration-files/dts-from-js.html)。
 
 ### checkJs (默认 false)
 
