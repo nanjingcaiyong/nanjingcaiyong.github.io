@@ -522,12 +522,14 @@ const KEY = Symbol('Hello world')
 
 ### jsx
 
-控制 `JSX` 在 `JavaScript` 文件中的输出方式。 这只影响 `.tsx` 文件的 `JS` 文件输出。
+默认不支持 `jsx` 语法。支持 `preserve`、`react`、`react-jsx`、`react-jsxdev`、`react-native`
 
+main.tsx
 ```tsx
 export const render = () => <div>hello world</div>
 ```
 
+tsconfig.json
 ```json
 {
   "compilerOptions": {
@@ -543,21 +545,35 @@ export const render = () => <div>hello world</div>
 ```
 
 **preserve**
+
 不对 JSX 进行改变并生成 .jsx 文件
 
+编译后的 `main.jsx`
 ```jsx
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.render = void 0;
 const render = () => <div>hello world</div>;
 exports.render = render;
-
 ```
 
 **react**
 
-将 JSX 改为等价的对 React.createElement 的调用并生成 .js 文件。
+将 `JSX` 改为等价的对 `React.createElement` 的调用并生成 `.js` 文件。
 
+当 `jsx` 选项设为 `react`，`main.tsx` 将报错：
+
+```tsx
+export const render = () => <div>hello world</div>; // “React”指 UMD 全局，但当前文件是模块。请考虑改为添加导入。ts(2686)
+```
+
+需要引入 `React` 模块，修改如下：
+```tsx
+import React from "react";
+export const render = () => <div>hello world</div>
+```
+
+编译后的 `main.js`
 ```js
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -568,7 +584,7 @@ exports.render = render;
 
 **react-jsx**
 
-改为 jsx 调用并生成 .js 文件
+改为 `__jsx` 调用并生成 `.js` 文件
 
 ```js
 "use strict";
@@ -581,7 +597,7 @@ exports.render = render;
 ```
 **react-jsxdev**
 
-改为 jsxDEV 调用并生成 .js 文件
+改为 `__jsx` 调用并生成 .js 文件
 
 ```js
 "use strict";
@@ -595,7 +611,7 @@ exports.render = render;
 ```
 **react-native**
 
-不对 JSX 进行改变并生成 .js 文件
+不对 `JSX` 进行改变并生成 `.js` 文件
 
 ```js
 "use strict";
@@ -605,33 +621,71 @@ const render = () => <div>hello world</div>;
 exports.render = render;
 ```
 
+### reactNamespace
+
+已弃用。使用`jsxFactory`替代
+
+### jsxFactory
+
+只有在 `jsx` 选项值为 `react` 时生效。
+
+更改使用经典 `JSX` 运行时编译 `JSX Elements` 时在 `.js` 文件中调用的函数。最常见的变化是使用 `h` 或 `React.createElement`。
+
+### jsxFragmentFactory
+
+### jsxImportSource
+
 ### experimentalDecorators 
 
 是否启用装饰器
 
 ### emitDecoratorMetadata
 
-启用对使用`reflect-metadata`模块的装饰器发射类型元数据的实验性支持
+需要先启用 `experimentalDecorators`。
 
-### jsxFactory
+启用对使用 `reflect-metadata` 模块的 `装饰器` 发射类型` 元数据`（是指附加在对象、类、方法、属性、参数上的数据,它可以用来帮助实现某种业务功能需要用到的数据）的实验性支持
 
-### jsxFragmentFactory
+`Reflect Metadata` 是 `ES7` 的一个提案，它主要用来在声明的时候添加和读取元数据。`TypeScript` 在 `1.5+` 的版本已经支持它，你只需要：
 
-### jsxImportSource
+- npm i reflect-metadata --save
+- 在 tsconfig.json 里配置 emitDecoratorMetadata 选项
 
-### reactNamespace
+Reflect Metadata 的 API 可以用于类或者类的属性上，如：
 
-已弃用。使用`jsxFactory`替代
+```sh
+function metadata(
+  metadataKey: any,
+  metadataValue: any
+): {
+  (target: Function): void;
+  (target: Object, propertyKey: string | symbol): void;
+};
+```
+
+`Reflect.metadata` 当作 `Decorator` 使用，当修饰类时，在类上添加元数据，当修饰类属性时，在类原型的属性上添加元数据，如：
+
+```ts
+@Reflect.metadata('inClass', 'A')
+class Test {
+  @Reflect.metadata('inMethod', 'B')
+  public hello(): string {
+    return 'hello world';
+  }
+}
+
+console.log(Reflect.getMetadata('inClass', Test)); // 'A'
+console.log(Reflect.getMetadata('inMethod', new Test(), 'hello')); // 'B'
+```
 
 ### noLib
 
-禁用自动包含任何库文件。如果设置了该选项，`lib`选项将被忽略。
+禁用自动包含任何库文件。如果设置了该选项，`lib` 选项将被忽略。
 
-当启用这个设置的时候`Array`, `Boolean`, `Function`, `IArguments`, `Number`, `Object`, `RegExp` and `String` 等类型都需要自己重新声明。除非你希望自己重新定义类型，否则不要做修改。
+当启用时，`Array`、`Boolean`、`Function`、`IArguments`、`Number`、`Object`、`RegExp`和 `String` 等类型都需要自己重新声明。除非你希望自己重新定义类型，否则不要做修改。
 
 ### useDefineForClassFields
 
-启用后的作用是将 class 声明中的字段语义从 [[Set]] 变更到 [[Define]]
+启用后的作用是将 `class` 声明中的字段语义从 [[Set]] 变更到 [[Define]]
 
 项目结构：
 
