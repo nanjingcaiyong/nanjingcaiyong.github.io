@@ -158,6 +158,11 @@ git commit -m <message> --squash
 git cherry-pick <commitId>
 ```
 
+合并冲突时，快速回到冲突前状态。注意，如果之前合并时使用挤压（--squash），那么该选项将无效（--abort）
+```sh
+git merge --abort
+```
+
 ### rebase（用于特性分支，禁止在环境分支上使用变基）
 
 ```sh

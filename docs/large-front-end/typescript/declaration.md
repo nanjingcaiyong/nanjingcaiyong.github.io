@@ -279,9 +279,11 @@ package.json
   ```
 
 - strictFunctionTypes
-  协变：子类赋值给父类，逆变：父类赋值给子类。TS是允许双变的，默认为（true，不允许函数入参协变）
+  协变：子类赋值给父类，
+  
+  逆变：父类赋值给子类。TS是允许双变的，默认为（true，不允许函数入参协变）
 
-  一般要求入参`逆变`，出参`协变`
+  一般要求入参`逆变`，出参 `协变`
   ```ts
   interface Animal {
     age: number
@@ -2016,7 +2018,7 @@ console.log(loggedInUser.age);
 
 ### strictFunctionTypes
 
-当开启时，TypeScript 会对 函数的参数类型使用更严格的检查。
+当`开启`时，TypeScript 会对 函数的参数类型使用更严格的检查（对函数参数类型启用逆变检查。）
 
 ```ts
 function fn(x: string) {
@@ -2454,3 +2456,22 @@ function fn(n: number) {
     "skipLibCheck": true                      // 跳过对所有.d.ts文件的类型检查
 }
 ```
+
+
+## 类型断言
+
+```ts
+interface IFoo {
+  name: string;
+}
+
+declare const obj: {
+  foo: IFoo
+}
+
+const {
+  foo = {} as IFoo
+} = obj
+```
+
+这里从 `{}` 字面量类型断言为了 `IFoo` 类型，即为`解构` `赋值默认值` 进行了预期的类型断言，否则在解构时使用默认值 `{}` 会将 `foo` 类型从 `IFoo` 变成 `{}`。当然，更严谨的方式应该是定义为 Partial<IFoo> 类型，即 IFoo 的属性均为可选的。
