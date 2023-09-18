@@ -107,8 +107,6 @@ type T1 = ConstructorParameters<any>; // type T1 = unknown[]
 
 ### ThisType\<Type\>
 
-
-
 ### ThisParameterType\<Type\>
 
 ### OmitThisParameter\<Type\>
@@ -125,6 +123,21 @@ type T1 = ConstructorParameters<any>; // type T1 = unknown[]
 
 
 ## 关键字
+
+### PropertyKey
+
+```ts
+// 空对象类型
+type EmptyObject = {
+  // type PropertyKey = string | number | symbol;
+  [K in PropertyKey]: never
+}
+
+const shouldPass: EmptyObject = {};
+const showFail: EmptyObject = {
+  prop: 'TS' // 不能将类型“string”分配给类型“never”。ts(2322)
+}
+```
 
 ### infer
 
@@ -154,6 +167,8 @@ type SwapResult2 = Swap<[1, 2, 3]>; // 不符合结构，没有发生替换，�
 ### extends
 
 条件类型中使用 `extends` 判断类型的 `兼容性`，而非判断类型的 `全等性`
+
+`T extends U` 意味着 `T 是 U` 的 `子类型`，但在`属性组成`的`联合类型`中却相反，U 的属性联合类型是 T 的属性联合类型的子类型
 
 ```ts
 type T0 = any extends string ? 1 : 2;     // 1 | 2
@@ -208,6 +223,46 @@ type StringKeyOnly = ConditionalPick<Example, string>
 
 `typeof` 操作符用于获取 `变量`（`typeof 后面只能跟变量，不能是类型`） 的类型
 
+### is
+
+它被称为`类型谓词`，用来判断一个变量属于某个接口或类型。如果需要封装一个`类型判断函数`，你应该第一时间想到它。
+
+```ts
+function isString(s: unknown): boolean {
+  return typeof s === 'string'
+}
+
+function toUpper (x: unknown) {
+  if (isString(x)) {
+    x.toUppercase(); // 类型“unknown”上不存在属性“toUppercase”。ts(2339)
+  }
+}
+```
+
+由于 `函数嵌套` TypeScript 不能进行正确的类型判断，所以上述代码会抛出一个错误提示
+
+```ts
+function isString(s: unknown): s is string {
+  return typeof s === 'string'
+}
+
+function toUpper (x: unknown) {
+  if (isString(x)) {
+    x.toUpperCase()
+  }
+}
+```
+
+通过 `is` 关键字将类型范围缩小为 string 类型，这也是一种代码健壮性的约束规范。
+```ts
+const isNumber = (val: unknown): val is number => typeof val === 'number'
+const isString = (val: unknown): val is string => typeof val === 'string'
+const isFunction = (val: unknown): val is Function => typeof val === 'function'
+```
+
+### InstanceType
+
+
 ## 基础类型
 
 ### 原始类型
@@ -219,8 +274,6 @@ type StringKeyOnly = ConditionalPick<Example, string>
 只能赋值给 `unknown` 和 `any` 类型
 
 **never**
-
-任何类型的子类型
 
 在类型流的分析中，一旦一个 `返回值` 类型为 `never` 的函数被调用，那么下方的代码都会被视为 `无效` 的代码（即无法执行到）：
 ```ts
@@ -236,6 +289,26 @@ function foo (input:number){
   }
 }
 
+```
+
+细节：never 是所欧
+
+细节一：碰上联合类型的时候会排除自己
+
+```ts
+type One = never | 1; // type One = 1
+```
+
+细节二：使用 never 作为泛型参数的时候产生了分布式条件类型，生成的类型不论条件类型返回值如何都是 never
+
+```ts
+type IsNumber<T> = T extends number ? true : false;
+type stillNever = IsNumber<never>; // type stillNever = never
+```
+
+细节三：判断是否是 never 类型，记得阻止条件分发机制
+```ts
+type IsNever<T> = [T] extends [never] ? true : false
 ```
 
 ### `any` 和 `unknown` 的区别
@@ -279,6 +352,29 @@ const tmp23: object = () => {};
 const tmp24: object = [];
 ```
 
+### object 和 Record\<any, any\>的区别
+
+```ts
+let t0:object = {};
+t0.name; // 类型“object”上不存在属性“name”。ts(2339)
+```
+
+object 定义是一个对象类型，不能自动获取定义在对象上的属性和方法
+
+```ts
+let t0:Record<any, any> = {};
+t0.name; // works
+```
+
+这里的 `Record<any, any>` 也就是 key 为 string 类型，value 为任意类型，可以代替 object 来用。更加语义话一点:
+```ts
+type T0 = Record<any, any>;
+// 等同于
+type T1 = {
+  [k: string]: any
+}
+```
+
 
 ### 字面量类型
 
@@ -290,6 +386,35 @@ const str = 'name';     // const str: "name"
 使用 const 声明的变量，其类型会从值推导出最精确的字面量类型。而 const 定义的对象类型则只会推导至符合其属性结构的接口。
 
 要解答这个现象，需要你回想 let 和 const 声明的意义。我们知道，使用 let 声明的变量是可以再次赋值的，在 TypeScript 中要求赋值类型始终与原类型一致（如果声明了的话）。因此对于 let 声明，只需要推导至这个值从属的类型即可。而 const 声明的原始类型变量将不再可变，因此类型可以直接一步到位收窄到最精确的字面量类型，但对象类型变量仍可变（但同样会要求其属性值类型保持一致）。
+
+### 函数类型
+```ts
+function f1 (name: string): number {
+  return name.length
+}
+
+const f2 = function (name: string): number {
+  return name.length
+}
+
+const f3 = (name: string): number => {
+  return name.length
+}
+
+const f4: (name: string) => number = (name) => {
+  return name.length
+}
+
+const f5: (name: string) => number = function (name) {
+  return name.length
+}
+
+type Func6 = (name: string) => number
+
+const f6: Func6 = (name) => {
+  return name.length
+}
+```
 
 ## type 与 interface
 
@@ -490,7 +615,6 @@ foo.getName()
 
 ## 断言
 
-
 ### 双重断言
 
 如果在使用类型断言时，`原类型` 与 `断言类型` 之间差异过大，也就是`指鹿为马`太过离谱，离谱到了指鹿为霸王龙的程度，TypeScript 会给你一个类型报错：
@@ -512,7 +636,6 @@ const str: string = 'zhangsan';
 这是因为你的 `断言类型` 和 `原类型` 的差异太大，需要先断言到一个 `通用类`，即 `any` / `unknown`。这一通用类型包含了所有可能的类型，因此断言到它和从它断言到另一个类型差异不大。
 
 ### 非空断言
-
 
 ## 类型工具
 
@@ -671,6 +794,14 @@ type isNever<T> = [T] extends [never] ? true : false;
 type T0 = isNever<never>; // type T0 = true;
 ```
 
+`T[number]` 用来获取 `元组` 的元素类型联合，`T['length']` 用来获取`元组`的元素长度
+```ts
+type T0 = ['a', 'b', 'c'];
+type T1 = T0['length']; // 3
+type T2 = T0[number]; // 'a' | 'b' | 'c'
+```
+
+
 
 ## 类型转换
 
@@ -756,3 +887,112 @@ interface T2 {
 ```
 
 进行如此约束的原因即，对于 `property` 声明，才能在 `开启严格函数类型检查` 的情况下享受到基于 `逆变的参数类型检查`。而对于 `method` 声明（以及构造函数声明），其 `无法` 享受到这一更严格的检查。
+
+### 展平交叉类型
+```ts
+type MarkPropsAsOptional<
+  T extends object,
+  K extends keyof T = keyof T         // 在不传入第二个泛型参数时，即 T 的全量属性 
+> = Partial<Pick<T, K>> & Omit<T, K>
+
+type Person = {
+  name: string;
+  age: number;
+  gender: boolean;
+}
+
+type T0 = MarkPropsAsOptional<Person, 'name' | 'age'>; // type T0 = Partial<Pick<Person, "name" | "age">> & Omit<Person, "name" | "age">
+
+// 使用 Pick 展平交叉类型
+type T1 = Pick<T0, keyof T0>; // type T1 = { name?: string; age?: number; gender: boolean; }
+
+```
+
+### 集合工具类型
+
+```ts
+// 并集
+type Concurrence<A, B> = A | B;
+
+// 交集
+type Intersection<A, B> = A extends B ? A : never;
+
+// 差集
+type Difference<A, B> = A extends B ? never : A;
+
+// 补集
+type Complement<A, B extends A> = Difference<A, B>;
+```
+
+### 互斥工具类型
+```ts
+interface VIP {
+  vipExpires: number;
+}
+
+interface CommonUser {
+  promotionUsed: boolean;
+}
+
+type Without<T, U> = {
+  [K in Exclude<keyof T, keyof U>]?: never
+}
+
+type XOR<T, U> = (Without<T, U> & U) | (Without<U, T> & T)
+
+const T0: XOR<VIP, CommonUser> = {
+  vipExpires: 1
+}
+
+const T1: XOR<VIP, CommonUser> = {      // error
+  vipExpires: 1,
+  promotionUsed: true
+}
+
+const T2: XOR<VIP, CommonUser> = {
+  promotionUsed: true
+}
+```
+
+空对象 和 {name: string, age: number} 二选一
+```ts
+type XORStruct = XOR<{}, {name: string, age: number}>
+
+const T1: XORStruct = {};
+const T2: XORStruct = { name: 'sa' }; // error
+const T3: XORStruct = {
+  name: 'sa',
+  age: 1
+}
+```
+
+
+
+### 模式匹配工具类型
+
+## 生态
+
+### tsd 断言库
+
+### vue-tsc
+
+### ts-node
+
+## namespace 与 module
+
+官方建议在现在代码中使用 `module` 替代 `namespace`
+
+## 三斜线 reference 和 import 区别
+
+### 使用三斜线 reference 引入，有常用两种方式 path和types
+
+- types 一般引入外部依赖的声明时使用
+- path 一般引入自己写的声明时使用
+
+引入非模块类的声明文件。非模块的声明文件引入后为全局类型，可以直接使用
+
+### import
+
+
+
+

@@ -70,9 +70,9 @@ func('a', 'b'); // ok
 ```ts
 // 第一种解法，函数重载
 function func (a: number, b: number): number;
-funciton func (a: string, b: string): string;
-function func (a: number | string, b: number: string) : number | string {
-  if (typeof a === 'string' && typeof b === 'string') {
+function func (a: string, b: string): string;
+function func (a: number | string, b: number| string) : number | string {
+  if (typeof a === 'string') {
     return a + ':' + b
   }
   return Number(a) + Number(b)
@@ -378,3 +378,22 @@ type NamesStars = JoinStrArray<Names, '⭐️'>;// "Sem⭐️Lolo⭐️Kaquko"
 ```
 
 解法：
+
+
+### 第十题：实现一个 OptionalKeys 工具类型，用来获取对象类型中声明的可选属性。具体的使用示例如下所示：
+
+```ts
+type Person = {
+  id: string;
+  name: string;
+  age: number;
+  from?: string;
+  speak?: string;
+};
+
+type OptionalKeys<T> = {
+  [K in keyof T]: T extends Record<K, T[K]> ? never : K
+}[keyof T]
+
+type PersonOptionalKeys = OptionalKeys<Person> // "from" | "speak"
+```
