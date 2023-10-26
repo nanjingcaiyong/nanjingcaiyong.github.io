@@ -775,6 +775,12 @@ class C {
 
 ## Modules
 
+### allowImportingTsExtensions
+
+默认 false
+
+允许在非 TypeScript 文件中导入 .ts 或 .tsx 文件。
+
 ### module
 
 设置编译后文件使用的模块系统

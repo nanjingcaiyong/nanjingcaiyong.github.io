@@ -1,40 +1,26 @@
-# `vitepress-starter`
 
-## 安装
-```bash
-npm i
-```
-
-## 版本控制
-示例：[major].[minor].[patch]
-
-### 第一次生成变更日志
-```bash
-npm run release -- --first-release
-```
-
-### 标准版本
-```bash
-npm run release
-```
-
-### 预发布版本
-```bash
-npm run release -- --prerelease
-```
-版本标记为：1.0.1-0
+## 项目目录
 
 
-如果预发布需要包含alpha前缀：
-```bash
-npm run release -- --prerelease alpha
-```
-版本标记为：1.0.1-alpha.0
+## 文章目录
 
+├── large-front-end             大前端
+│   ├── css
+│   │   ├── index
+│   ├── html
+│   ├── javascript
+│   ├── typescript
+├── index.ts
+├── news
+│   ├── browsers-diference      浏览器差异
+│   ├── cjs-env-var             ESM和cjs环境变量差异
+│   ├── common-tool-packages    常用的工具包
+│   ├── docker                  docker
+├── about                       关于我
+├── computer                    计算机
+├── database                    数据库
+├── devops                      运维
+├── guide
+├── index
+└── tsconfig.json
 
-### 目标版本
-```bash
-npm run release -- --release-as minor #或者
-npm run release -- --release-as 1.1.0
-```
-获得版本标记为1.1.0，而不是自动生成的版本1.0.1

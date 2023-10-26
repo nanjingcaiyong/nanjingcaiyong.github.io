@@ -1,5 +1,5 @@
 
-# Docker 和 docker-compose
+# Docker
 ## 基础知识
 
 ### 容器（container）
@@ -17,7 +17,7 @@ docker image pull [image:version]
 ```sh
 # -f 指定要使用的Dockerfile路径
 # -t 镜像的名字及标签，通常 name:tag 或者 name 格式；可以在一次构建中为一个镜像设置多个标签
-docker build -f ./Dockerfile -t [image:version]
+docker build -f ./Dockerfile -t [image:version] .
 ```
 
 启动
@@ -72,6 +72,25 @@ docker restart [containerId]
 docker rm [containerId]
 ```
 
+
+### 暂停容器
+```sh
+docker pause [containerId]
+```
+
+### 重启暂停容器
+
+```sh
+docker unpause [containerId]
+```
+
+### options
+| 名称    | 选项 | 说明           |
+|--------|-----|----------------|
+| 端口    | -p | 主机端口映射到容器端口(80:80)        |
+| 镜像名称 | -t | 格式：[name:tag] |
+| 配置路径 | -p | Dockerfile文件地址 |
+|| -d | 
 
 ## Dockerfile
 
@@ -131,6 +150,9 @@ RUN npm i -g pnpm
 指定运行容器时的用户名或UID，后续的 `RUN` 也会使用指定用户
 
 ### WORKDIR
+
+在 `镜像中` 创建一个 `文件夹` 存放 `应用程序代码`, 这将是你的应用程序工作目录
+
 为后续的`RUN`、`CMD`、`ENTRYPOINT` 指令配置工作目录（可以同时使用多个 `WORKDIR` 指令，后续命令如果参数是相对路径，则会基于之前命令指定的路径
 
 ### ONBUILD
@@ -143,3 +165,10 @@ RUN npm i -g pnpm
 ## 案例
 
 ### 启动 vue 项目
+
+
+# 三大编排工具
+
+compose、machine 和 swarm 是docker 原生提供的三大编排工具。简称docker三剑客。
+
+Kubernetes
