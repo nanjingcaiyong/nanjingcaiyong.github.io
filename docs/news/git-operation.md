@@ -220,3 +220,50 @@ git branch -a | grep -E 'master|develop' | xargs git branch -D
 # 删除排除外的所有分支
 git branch -a | grep -v -E 'master|develop' | xargs git branch -D
 ```
+
+
+## 常用操作
+
+### 跨项目合并代码
+
+1、关联另一个项目
+```bash
+git remote add other git@github.com:nanjingcaiyong/xxx.git
+```
+
+2、将另一个项目的信息拉取到本地（分支、标签、提交记录等）
+```bash
+git fetch other
+```
+
+3、合并代码
+```bash
+git merge other/xxx
+```
+
+执行上述代码会报错 `fatal: 拒绝合并无关的历史`
+
+因为当前项目分支和另一个项目提交记录没有关联，所以我们要告诉 git 允许合并无关历史的记录 `--allow-unrelated-histories`
+
+```bash
+git pull self/moeny --allow-unrelated-histories
+```
+
+### 恢复本地误删的分支
+
+1、找到误删分支的`最新一次`提交记录，复制 `commitId`
+
+```sh
+git checkout [commitId]
+```
+执行该命令后 Git 会将 `指定的提交状态` 的代码检出到工作目录中，覆盖当前工作目录中的代码。这样，您就可以查看指定提交状态的代码，并在此基础上进行`修改`或者`回滚`。
+
+执行完成后会创建一个`临时分支`
+
+2、基于当前临时分支创建新的分支，新分支将成为你误删的分支
+
+```bash
+git checkout -b feat/new
+```
+
+
